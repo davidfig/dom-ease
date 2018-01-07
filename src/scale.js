@@ -25,7 +25,15 @@ module.exports = class Scale
     {
         const options = this.options
         this.time += elapsed
-        const value = options.ease(this.time, this.start, this.delta, options.duration)
+        let value
+        if (this.time >= options.duration)
+        {
+            value = this.to
+        }
+        else
+        {
+            value = options.ease(this.time, this.start, this.delta, options.duration)
+        }
         const transform = this.element.style.transform
         const scale = transform.indexOf('scale(')
         if (!transform)
@@ -38,7 +46,7 @@ module.exports = class Scale
         }
         else
         {
-            this.element.style.transform = transform.substr(0, scale + ('scale(').length) + value + transform.indexOf(')', scale)
+            this.element.style.transform = transform.substr(0, scale + ('scale(').length) + value + transform.substr(transform.indexOf(')'))
         }
         if (this.time >= options.duration)
         {
