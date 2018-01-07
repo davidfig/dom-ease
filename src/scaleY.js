@@ -2,6 +2,7 @@ module.exports = class ScaleY
 {
     constructor(element, y, options)
     {
+        this.name = 'scaleY'
         this.element = element
         this.options = options
         this.to = y

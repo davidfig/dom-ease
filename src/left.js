@@ -2,6 +2,7 @@ module.exports = class Left
 {
     constructor(element, x, options)
     {
+        this.name = 'left'
         this.element = element
         this.to = x
         this.options = options

@@ -2,15 +2,18 @@
 a simple and super fast DOM animation library
 
 ## rationale
-This is a simple library to animate DOM objects. It does not have all the bells and whistles of a complete libary like [Velocity.js](http://velocityjs.org/), but it gets the job done with a nice event system.
+This is a simple library to animate DOM objects. It does not have all the bells and whistles of a library like [Velocity.js](http://velocityjs.org/), but it gets the job done with a nice event system.
 
 ## features
 Currently, the library only has a limited set of features. I'll add more as I need them.
 
-* top / left (alternatively x / y)
+* top / left in px
 * transform.scale
 * transform.scaleX / transform.scaleY (these are separate animations from transforms.scale()) 
-* flash animation (cycles through a list of background colors) 
+* color animation (one or more colors to cycle through, including the current color)
+* backgroundColor animation (one or more background colors to cycle through, including the current color)
+* width / height in px
+* opacity
 
 ## Installation
 

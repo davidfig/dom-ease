@@ -2,6 +2,7 @@ module.exports = class Top
 {
     constructor(element, y, options)
     {
+        this.name = 'top'
         this.element = element
         this.to = y
         this.options = options
