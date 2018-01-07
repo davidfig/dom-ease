@@ -5,6 +5,9 @@ const exists = require('exists')
 const Left = require('./left')
 const Top = require('./top')
 const Flash = require('./flash')
+const ScaleX = require('./scaleX')
+const ScaleY = require('./scaleY')
+const Scale = require('./scale')
 
 module.exports = class DomEase extends Events
 {
@@ -135,6 +138,18 @@ module.exports = class DomEase extends Events
 
                 case 'flash':
                     animations[param] = new Flash(element, animate[param], options)
+                    break
+
+                case 'scale':
+                    animations[param] = new Scale(element, animate[param], options)
+                    break
+
+                case 'scaleX':
+                    animations[param] = new ScaleX(element, animate[param], options)
+                    break
+
+                case 'scaleY':
+                    animations[param] = new ScaleY(element, animate[param], options)
                     break
 
                 case 'element':

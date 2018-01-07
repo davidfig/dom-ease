@@ -8,6 +8,8 @@ This is a simple library to animate DOM objects. It does not have all the bells 
 Currently, the library only has a limited set of features. I'll add more as I need them.
 
 * top / left (alternatively x / y)
+* transform.scale
+* transform.scaleX / transform.scaleY (these are separate animations from transforms.scale()) 
 * flash animation (cycles through a list of background colors) 
 
 ## Installation

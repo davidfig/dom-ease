@@ -21,9 +21,10 @@ function create()
         document.body.removeChild(box)
     }
     y = 0
-    ease.add(box(), { x: window.innerWidth - SIZE }, { repeat: true })
-    ease.add(box(), { x: window.innerWidth - SIZE }, { repeat: true, reverse: true })
+    ease.add(box(), { x: window.innerWidth - SIZE, scaleX: 2 }, { repeat: true })
+    ease.add(box(), { x: window.innerWidth - SIZE, scaleY: 2 }, { repeat: true, reverse: true })
     ease.add(box(), { y: window.innerHeight - SIZE }, { repeat: true, reverse: true })
+    ease.add(box(), { scale: 0 }, { repeat: true, reverse: true })
     ease.add(box(), { flash: ['transparent'] }, { repeat: true, duration: 500 })
 }
 create()
