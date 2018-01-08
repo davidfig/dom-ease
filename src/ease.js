@@ -2,7 +2,7 @@ const EventEmitter = require('eventemitter3')
 const Penner = require('penner')
 const exists = require('exists')
 
-const DomEaseElement = require('./src/easeElement')
+const DomEaseElement = require('./easeElement')
 
 /**
  * Manages all animations running on DOM objects
