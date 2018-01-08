@@ -35,7 +35,7 @@ module.exports = class ScaleX
         }
         else if (scaleX == -1)
         {
-            this.element.style.tranform += ' scaleX(' + scale + ')'
+            this.element.style.transform += ' scaleX(' + scale + ')'
         }
         else
         {

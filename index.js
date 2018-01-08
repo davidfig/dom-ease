@@ -2,17 +2,27 @@ const Events = require('eventemitter3')
 const Penner = require('penner')
 const exists = require('exists')
 
-const Animate = require('./src/animate')
+const DomEaseElement = require('./src/easeElement')
 
-module.exports = class DomEase extends Events
+/**
+ * Manages all animations running on DOM objects
+ * @example
+ *
+ *    var Ease = require('dom-ease');
+ *    var ease = new Ease({ duration: 3000, ease: 'easeInOutSine' });
+ *
+ *    var test = document.getElementById('test')
+ *    ease.add(test, { left: 20, top: 15, opacity: 0.25 }, { repeat: true, reverse: true })
+ */
+class DomEase extends Events
 {
     /**
      * @param {object} [options]
      * @param {number} [options.duration=1000] default duration
      * @param {(string|function)} [options.ease=penner.linear] default ease
      * @param {(string|function)} [options.autostart=true]
-     * @fires complete
-     * @fires each
+     * @fires DomEase#complete
+     * @fires DomEase#each
      */
     constructor(options)
     {
@@ -65,28 +75,27 @@ module.exports = class DomEase extends Events
     }
 
     /**
-     * this is the object return by calling add()
-     * @typedef Animation
-     * @type {object}
-     * @property {number} time - current time
-     * @property {object} options - options passed (be careful changing these)
-     * @fires each
-     * @fires complete
-     * @fires loop - called when animation repeats or reverses
-     */
-
-    /**
      * start an animation
      * @param {(HTMLElement|HTMLElement[])} element
-     * @param {object} animate (currently supports x, y, flash)
+     * @param {object} params
+     * @param {number} [params.left] uses px
+     * @param {number} [params.top] uses px
+     * @param {number} [params.width] uses px
+     * @param {number} [params.height] uses px
+     * @param {number} [params.scale]
+     * @param {number} [params.scaleX]
+     * @param {number} [params.scaleY]
+     * @param {number} [params.opacity]
+     * @param {(color|color[])} [params.color]
+     * @param {(color|color[])} [params.backgroundColor]
      * @param {object} [options]
      * @param {number} [options.duration]
      * @param {(string|function)} [options.ease]
      * @param {(boolean|number)} [options.repeat]
      * @param {boolean} [options.reverse]
-     * @returns {Animation}
+     * @returns {DomEaseElement}
      */
-    add(element, animate, options)
+    add(element, params, options)
     {
         // call add on all elements if array
         if (Array.isArray(element))
@@ -95,11 +104,11 @@ module.exports = class DomEase extends Events
             {
                 if (i === element.length - 1)
                 {
-                    return this.add(element[i], animate, options)
+                    return this.add(element[i], params, options)
                 }
                 else
                 {
-                    this.add(element[i], animate, options)
+                    this.add(element[i], params, options)
                 }
             }
         }
@@ -115,12 +124,12 @@ module.exports = class DomEase extends Events
 
         if (element.__domEase)
         {
-            element.__domEase.add(animate, options)
+            element.__domEase.add(params, options)
         }
         else
         {
-            const domEase = element.__domEase = new Animate(element)
-            domEase.add(animate, options)
+            const domEase = element.__domEase = new DomEaseElement(element)
+            domEase.add(params, options)
             this.list.push(domEase)
         }
         return element.__domEase
@@ -148,16 +157,17 @@ module.exports = class DomEase extends Events
     {
         while (this.list.length)
         {
-            const animate = this.list.pop()
-            if (animate.element.__domEase)
+            const DomEaseElement = this.list.pop()
+            if (DomEaseElement.element.__domEase)
             {
-                delete animate.element.__domEase
+                delete DomEaseElement.element.__domEase
             }
         }
     }
 
     /**
      * update frame
+     * this is called automatically if start() is used
      * @param {number} elapsed time in ms
      */
     update(elapsed)
@@ -180,19 +190,19 @@ module.exports = class DomEase extends Events
     }
 
     /**
-     * number of elements being animated
-     * @type {number}
+     * number of elements being DomEaseElementd
+     * @returns {number}
      */
-    get countElements()
+    countElements()
     {
         return this.list.length
     }
 
     /**
      * number of active animations across all elements
-     * @type {number}
+     * @returns {number}
      */
-    get countRunning()
+    countRunning()
     {
         let count = 0
         for (let entry of this.list)
@@ -201,22 +211,18 @@ module.exports = class DomEase extends Events
         }
         return count
     }
-
-    /**
-     * fires when there are no more animations
-     * @event complete
-     * @type {(DomEase|Animation)}
-     */
-
-    /**
-     * fires on each loop where there are animations
-     * @event each
-     * @type {(DomEase|Animation)}
-     */
-
-    /**
-     * fires when an animation repeats or reverses
-     * @event loop
-     * @type {Animation}
-     */
 }
+
+/**
+ * fires when there are no more animations for a DOM element
+ * @event DomEase#complete
+ * @type {DomEase}
+ */
+
+/**
+ * fires on each loop for a DOM element where there are animations
+ * @event DomEase#each
+ * @type {DomEase}
+ */
+
+module.exports = DomEase

@@ -23,7 +23,7 @@ function create()
     y = 0
     ease.add(box('scaleX'), { scaleX: 2 }, { repeat: true })
     ease.add(box('scaleY'), { scaleY: 2 }, { repeat: true, reverse: true })
-    ease.add(box('top/left'), { left: window.innerWidth - SIZE, top: window.innerHeight - SIZE }, { repeat: true, reverse: true })
+    ease.add(box('top/left'), { left: window.innerWidth / 2, top: window.innerHeight / 2 }, { repeat: true, reverse: true })
     ease.add(box('scale'), { scale: 0 }, { repeat: true, reverse: true })
     ease.add(box('backgroundColor'), { backgroundColor: ['red', 'blue', 'transparent'] }, { repeat: true, duration: 500 })
     ease.add(box('opacity'), { opacity: 0 }, { repeat: true, reverse: true })
@@ -48,7 +48,7 @@ remove.onclick = () =>
     {
         ease.add(boxes[0], { scaleX: 2 }, { repeat: true })
         ease.add(boxes[1], { scaleY: 2 }, { repeat: true, reverse: true })
-        ease.add(boxes[2], { left: window.innerWidth - SIZE, top: window.innerHeight - SIZE }, { repeat: true, reverse: true })
+        ease.add(boxes[2], { left: window.innerWidth / 2, top: window.innerHeight / 2 }, { repeat: true, reverse: true })
         ease.add(boxes[3], { scale: 0 }, { repeat: true, reverse: true })
         ease.add(boxes[4], { backgroundColor: ['red', 'blue', 'transparent'] }, { repeat: true, duration: 500 })
         ease.add(boxes[5], { opacity: 0 }, { repeat: true, reverse: true })
@@ -60,6 +60,9 @@ remove.onclick = () =>
 }
 const reset = html({ parent: buttons, type: 'button', styles: { margin: '5px' }, html: 'reset boxes' })
 reset.onclick = () => create()
+
+const api = html({ parent: buttons, type: 'button', styles: { margin: '5px' }, html: 'API documentation' })
+api.onclick = () => window.location.href = 'jsdoc/'
 
 function box(words)
 {

@@ -35,7 +35,7 @@ module.exports = class ScaleY
         }
         else if (scaleY == -1)
         {
-            this.element.style.tranform += ' scaleY(' + scale + ')'
+            this.element.style.transform += ' scaleY(' + scale + ')'
         }
         else
         {

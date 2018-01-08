@@ -21,12 +21,8 @@ Here's a list of supported animations:
 
 ## Live Demo
 [https://davidfig.github.io/dom-ease/](https://davidfig.github.io/dom-ease/)
-
-## API Documentation
-[https://davidfig.github.io/dom-ease/jsdoc/](https://davidfig.github.io/dom-ease/jsdoc)
-
+    
 ## Simple Usage
-```js
     const Ease = require('dom-ease')
 
     // set up ease

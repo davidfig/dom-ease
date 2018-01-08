@@ -42,7 +42,7 @@ module.exports = class Scale
         }
         else if (scale == -1)
         {
-            this.element.style.tranform += ' scale(' + value + ')'
+            this.element.style.transform += ' scale(' + value + ')'
         }
         else
         {
