@@ -1,4 +1,4 @@
-const Events = require('eventemitter3')
+const EventEmitter = require('eventemitter3')
 
 const Left = require('./left')
 const Top = require('./top')
@@ -11,10 +11,11 @@ const Opacity = require('./opacity')
 const Width = require('./width')
 const Height = require('./height')
 
-class DomEaseElement extends Events
+class DomEaseElement extends EventEmitter
 {
     /**
      * each DOM element has its own DomEaseElement object returned by add() or accessed through HTMLElement.__domEase
+     * @extends EventEmitter
      * @fires DomEaseElement#each-*
      * @fires DomEaseElement#complete-*
      * @fires DomEaseElement#loop-* - called when animation repeats or reverses

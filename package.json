@@ -1,13 +1,13 @@
 {
     "name": "dom-ease",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "description": "an animation library using easing functions",
     "main": "index.js",
     "scripts": {
         "test": "budo docs/code.js:index.js --live --dir docs",
         "build-demo": "browserify docs/code.js -o docs/index.js",
         "setup": "npm run build-demo && npm run docs",
-        "docs": "jsdoc -c docs/jsdoc.conf"
+        "docs": "jsdoc -c docs/jsdoc.conf.json"
     },
     "repository": {
         "type": "git",

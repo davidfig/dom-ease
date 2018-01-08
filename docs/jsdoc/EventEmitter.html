@@ -201,7 +201,7 @@
     </ul>
 </div>
     <div class="main">
-        <h1 class="page-title" data-filename="DomEaseElement.html">Class: DomEaseElement</h1>
+        <h1 class="page-title" data-filename="EventEmitter.html">Class: EventEmitter</h1>
         
 
 
@@ -210,7 +210,7 @@
     
 <header>
     <div class="header content-size">
-        <h2>DomEaseElement
+        <h2>EventEmitter
         </h2>
         
     </div>
@@ -224,10 +224,10 @@
         
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="DomEaseElement">
-            <a class="share-icon" href="#DomEaseElement"><span class="glyphicon glyphicon-link"></span></a>
+        <h4 class="name" id="EventEmitter">
+            <a class="share-icon" href="#EventEmitter"><span class="glyphicon glyphicon-link"></span></a>
             <span class="">
-                new DomEaseElement
+                new EventEmitter
             </span>
             <span class="signature">()</span>
             
@@ -238,7 +238,7 @@
     
         
         <div class="tag-source">
-            <a href="src_easeElement.js.html#line23">easeElement.js:23</a>
+            <a href="node_modules_eventemitter3_index.js.html#line92">index.js:92</a>
         </div>
         
     </div>
@@ -249,7 +249,8 @@
     
     
     <div class="description">
-        each DOM element has its own DomEaseElement object returned by add() or accessed through HTMLElement.__domEase
+        Minimal `EventEmitter` interface that is molded against the Node.js
+`EventEmitter` interface.
     </div>
     
 
@@ -284,15 +285,6 @@
 
     
     
-    <h5>Fires:</h5>
-    <ul>
-        <li><a href="DomEaseElement.html#event:each-*">DomEaseElement#event:each-*</a></li>
-    
-        <li><a href="DomEaseElement.html#event:complete-*">DomEaseElement#event:complete-*</a></li>
-    
-        <li>DomEaseElement#event:loop-* - called when animation repeats or reverses</li>
-    </ul>
-    
 
     
 
@@ -309,11 +301,6 @@
     </div>
     
     
-        <h3 class="subsection-title">Extends</h3>
-        
-        <ul>
-            <li><a href="EventEmitter.html">EventEmitter</a></li>
-        </ul>
     
     
     
@@ -323,62 +310,6 @@
     
     
     
-    
-    
-        <h3 class="subsection-title">Members</h3>
-        
-        <dl class="list-members">
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="element">
-            <a class="share-icon" href="#element"><span class="glyphicon glyphicon-link"></span></a>
-            <span class="">element</span>
-            <span class="type-signature type">HTMLElement</span>
-            
-            
-            
-            
-        </h4>
-    </div>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        element being animated
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        </dl>
     
     
     
@@ -396,8 +327,6 @@
             <span class="signature">(event)</span><span class="type-signature">Boolean</span>
             
             
-            
-                <span class="access-signature inherited"><a href="EventEmitter.html#emit">inherited</a></span>
             
             
         </h4>
@@ -552,8 +481,6 @@
             
             
             
-                <span class="access-signature inherited"><a href="EventEmitter.html#eventNames">inherited</a></span>
-            
             
         </h4>
     
@@ -659,8 +586,6 @@ listeners.
             <span class="signature">(event)</span><span class="type-signature">Number</span>
             
             
-            
-                <span class="access-signature inherited"><a href="EventEmitter.html#listenerCount">inherited</a></span>
             
             
         </h4>
@@ -815,8 +740,6 @@ listeners.
             
             
             
-                <span class="access-signature inherited"><a href="EventEmitter.html#listeners">inherited</a></span>
-            
             
         </h4>
     
@@ -969,8 +892,6 @@ listeners.
             <span class="signature">(event, fn, <span class="optional">context</span>)</span><span class="type-signature"><a href="EventEmitter.html">EventEmitter</a></span>
             
             
-            
-                <span class="access-signature inherited"><a href="EventEmitter.html#on">inherited</a></span>
             
             
         </h4>
@@ -1204,8 +1125,6 @@ listeners.
             
             
             
-                <span class="access-signature inherited"><a href="EventEmitter.html#once">inherited</a></span>
-            
             
         </h4>
     
@@ -1438,8 +1357,6 @@ listeners.
             
             
             
-                <span class="access-signature inherited"><a href="EventEmitter.html#removeAllListeners">inherited</a></span>
-            
             
         </h4>
     
@@ -1599,8 +1516,6 @@ listeners.
             <span class="signature">(event, fn, context, once)</span><span class="type-signature"><a href="EventEmitter.html">EventEmitter</a></span>
             
             
-            
-                <span class="access-signature inherited"><a href="EventEmitter.html#removeListener">inherited</a></span>
             
             
         </h4>
@@ -1818,268 +1733,6 @@ listeners.
     
     
 
-    
-        <h3 class="subsection-title">Events</h3>
-        
-        <dl class="list-events">
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="event:complete-*">
-            <a class="share-icon" href="#event:complete-*"><span class="glyphicon glyphicon-link"></span></a>
-            <span class="">
-                complete-*
-            </span>
-            
-            
-            
-            
-            
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="src_easeElement.js.html#line134">easeElement.js:134</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        fires when there are no more animationswhere name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="DomEaseElement.html">DomEaseElement</a></span>
-
-
-            </li>
-        </ul>
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="event:each-*">
-            <a class="share-icon" href="#event:each-*"><span class="glyphicon glyphicon-link"></span></a>
-            <span class="">
-                each-*
-            </span>
-            
-            
-            
-            
-            
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="src_easeElement.js.html#line141">easeElement.js:141</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        fires on each loop where there are animationswhere name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="DomEaseElement.html">DomEaseElement</a></span>
-
-
-            </li>
-        </ul>
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="event:loop-*">
-            <a class="share-icon" href="#event:loop-*"><span class="glyphicon glyphicon-link"></span></a>
-            <span class="">
-                loop-*
-            </span>
-            
-            
-            
-            
-            
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="src_easeElement.js.html#line148">easeElement.js:148</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        fires when an animation repeats or reverseswhere name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="DomEaseElement.html">DomEaseElement</a></span>
-
-
-            </li>
-        </ul>
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        </dl>
     
 </article>
 

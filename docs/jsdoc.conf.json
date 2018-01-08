@@ -17,19 +17,32 @@
     "linenums": true,
     "source": {
         "include": [
-            "./",
-            "./src"
+            "./src",
+            "./node_modules/eventemitter3"
         ],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
-        "readme": "./README.jsdoc.md",
+        "readme": "./README.md",
         "encoding": "utf8",
-        "recurse": false,
+        "recurse": true,
         "private": false,
         "lenient": true,
         "destination": "./docs/jsdoc",
         "template": "./node_modules/@pixi/jsdoc-template"
+    },
+    "templates": {
+        "default": {
+            "outputSourceFiles": true
+        },
+        "applicationName": "dom-ease",
+        "footer"        : "by YOPEY YOPEY LLC (yopeyopey.com)",
+        "copyright"     : "Copyright © 2018 YOPEY YOPEY LLC.",
+        "meta": {
+            "title": "dom-ease API Documentation",
+            "description": "Documentation for dom-ease library",
+            "keyword": "docs, documentation, html5, javascript, jsdoc, dom, ease, animate"
+        }
     }
 }

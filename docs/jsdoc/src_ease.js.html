@@ -201,49 +201,254 @@
     </ul>
 </div>
     <div class="main">
-        <h1 class="page-title" data-filename="index.html">Index</h1>
+        <h1 class="page-title" data-filename="src_ease.js.html">Source: src/ease.js</h1>
         
 
 
     
-
-
-    <h3> </h3>
-
-
-
-
-
-
-
-
-    
-
-
-
-
     <section>
-        <article class="readme content-size"><h2>dom-ease</h2><p>a simple and super fast DOM animation library</p>
-<h2>rationale</h2><p>This is a simple library to animate DOM objects. It does not have all the bells and whistles of a library like <a target="_blank" href="http://velocityjs.org/">Velocity.js</a>, but it gets the job done with a nice event system.</p>
-<h2>features</h2><p>Here's a list of supported animations:</p>
-<ul>
-<li>top / left in px</li>
-<li>scale</li>
-<li>scaleX / scaleY</li>
-<li>color - one or more colors to cycle through, including the current color</li>
-<li>backgroundColor - one or more background colors to cycle through, including the current color</li>
-<li>width / height in px</li>
-<li>opacity</li>
-</ul>
-<h2>Installation</h2><pre class="prettyprint source"><code>npm i dom-ease</code></pre><h2>Live Demo</h2><p><a target="_blank" href="https://davidfig.github.io/dom-ease/">https://davidfig.github.io/dom-ease/</a></p>
-<h2>API Documentation</h2><p><a target="_blank" href="https://davidfig.github.io/dom-ease/jsdoc">https://davidfig.github.io/dom-ease/jsdoc/</a></p>
-<h2>Simple Usage</h2><pre class="prettyprint source lang-js"><code>    const Ease = require('dom-ease')
+        <header>
+            <div class="header content-size">
+                <h2>src/ease.js</h2>
+            </div>
+        </header>
+        <article>
+            <pre id="source-code" class="prettyprint source "><code>const EventEmitter = require('eventemitter3')
+const Penner = require('penner')
+const exists = require('exists')
 
-    // set up ease
-    const ease = new Ease({ duration: 1500 })
+const DomEaseElement = require('./src/easeElement')
 
-    const div = document.getElementById('test')
-    ease.add(div, { x: 100, y: 200 }, { reverse: true, repeat: true, duration: 2500, ease: 'easeInOutQuad' })</code></pre><h2>License</h2><p>MIT License<br>(c) 2017 <a target="_blank" href="https://yopeyopey.com/">YOPEY YOPEY LLC</a> by <a target="_blank" href="https://twitter.com/yopey_yopey/">David Figatner</a></p></article>
+/**
+ * Manages all animations running on DOM objects
+ * @extends EventEmitter
+ * @example
+ * var Ease = require('dom-ease');
+ * var ease = new Ease({ duration: 3000, ease: 'easeInOutSine' });
+ *
+ * var test = document.getElementById('test')
+ * ease.add(test, { left: 20, top: 15, opacity: 0.25 }, { repeat: true, reverse: true })
+ */
+class DomEase extends EventEmitter
+{
+    /**
+     * @param {object} [options]
+     * @param {number} [options.duration=1000] default duration
+     * @param {(string|function)} [options.ease=penner.linear] default ease
+     * @param {(string|function)} [options.autostart=true]
+     * @fires DomEase#complete
+     * @fires DomEase#each
+     */
+    constructor(options)
+    {
+        super()
+        this.options = options || {}
+        this.options.duration = this.options.duration || 1000
+        this.options.ease = this.options.ease || Penner.linear
+        this.list = []
+        this.empty = true
+        if (!options.autostart)
+        {
+            this.start()
+        }
+    }
+
+    /**
+     * start animation loop
+     * alternatively, you can manually call update() on each loop
+     */
+    start()
+    {
+        if (!this._requested)
+        {
+            this._requested = true
+            this.loop()
+        }
+    }
+
+    loop(time)
+    {
+        if (time)
+        {
+            const elapsed = this._last ? time - this._last : 0
+            this.update(elapsed)
+        }
+        this._last = time
+        this._requestId = window.requestAnimationFrame((time) => this.loop(time))
+    }
+
+    /**
+     * stop animation loop
+     */
+    stop()
+    {
+        if (this._requested)
+        {
+            window.cancelAnimationFrame(this._requestId)
+            this._requested = false
+        }
+    }
+
+    /**
+     * add animation(s) to a DOM element
+     * @param {(HTMLElement|HTMLElement[])} element
+     * @param {object} params
+     * @param {number} [params.left] uses px
+     * @param {number} [params.top] uses px
+     * @param {number} [params.width] uses px
+     * @param {number} [params.height] uses px
+     * @param {number} [params.scale]
+     * @param {number} [params.scaleX]
+     * @param {number} [params.scaleY]
+     * @param {number} [params.opacity]
+     * @param {(color|color[])} [params.color]
+     * @param {(color|color[])} [params.backgroundColor]
+     * @param {object} [options]
+     * @param {number} [options.duration]
+     * @param {(string|function)} [options.ease]
+     * @param {(boolean|number)} [options.repeat]
+     * @param {boolean} [options.reverse]
+     * @returns {DomEaseElement}
+     */
+    add(element, params, options)
+    {
+        // call add on all elements if array
+        if (Array.isArray(element))
+        {
+            for (let i = 0; i &lt; element.length; i++)
+            {
+                if (i === element.length - 1)
+                {
+                    return this.add(element[i], params, options)
+                }
+                else
+                {
+                    this.add(element[i], params, options)
+                }
+            }
+        }
+
+        // set up default options
+        options = options || {}
+        options.duration = exists(options.duration) ? options.duration : this.options.duration
+        options.ease = options.ease || this.options.ease
+        if (typeof options.ease === 'string')
+        {
+            options.ease = Penner[options.ease]
+        }
+
+        if (element.__domEase)
+        {
+            element.__domEase.add(params, options)
+        }
+        else
+        {
+            const domEase = element.__domEase = new DomEaseElement(element)
+            domEase.add(params, options)
+            this.list.push(domEase)
+        }
+        return element.__domEase
+    }
+
+    /**
+     * remove animation(s)
+     * @param {(Animation|HTMLElement)} object
+     */
+    remove(object)
+    {
+        const element = object.__domEase ? object.__domEase.element : object
+        const index = this.list.indexOf(element)
+        if (index !== -1)
+        {
+            this.list.splice(index, 1)
+        }
+        delete element.__domEase
+    }
+
+    /**
+     * remove all animations from list
+     */
+    removeAll()
+    {
+        while (this.list.length)
+        {
+            const DomEaseElement = this.list.pop()
+            if (DomEaseElement.element.__domEase)
+            {
+                delete DomEaseElement.element.__domEase
+            }
+        }
+    }
+
+    /**
+     * update frame; this is called automatically if start() is used
+     * @param {number} elapsed time in ms
+     */
+    update(elapsed)
+    {
+        for (let i = 0, _i = this.list.length; i &lt; _i; i++)
+        {
+            if (this.list[i].update(elapsed))
+            {
+                this.list.splice(i, 1)
+                i--
+                _i--
+            }
+        }
+        this.emit('each', this)
+        if (!this.empty &amp;&amp; Array.keys(this.list).length === 0 &amp;&amp; !this.empty)
+        {
+            this.emit('done', this)
+            this.empty = true
+        }
+    }
+
+    /**
+     * number of elements being DomEaseElementd
+     * @returns {number}
+     */
+    countElements()
+    {
+        return this.list.length
+    }
+
+    /**
+     * number of active animations across all elements
+     * @returns {number}
+     */
+    countRunning()
+    {
+        let count = 0
+        for (let entry of this.list)
+        {
+            count += Object.keys(entry) - 1
+        }
+        return count
+    }
+
+    /**
+     * @var
+     */
+}
+
+/**
+ * fires when there are no more animations for a DOM element
+ * @event DomEase#complete
+ * @type {DomEase}
+ */
+
+/**
+ * fires on each loop for a DOM element where there are animations
+ * @event DomEase#each
+ * @type {DomEase}
+ */
+
+/**
+ * @external EventEmitter
+ */
+
+module.exports = DomEase</code></pre>
+        </article>
     </section>
 
 
@@ -255,7 +460,7 @@
 
         <footer class="content-size">
             <div class="footer">
-                Documentation generated by <a target="_blank" href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 08 2018 12:58:44 GMT+0800 (DST)
+                Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 08 2018 12:58:44 GMT+0800 (DST)
             </div>
         </footer>
     </div>
