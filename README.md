@@ -32,7 +32,7 @@ Here's a list of supported animations:
     // set up ease
     const ease = new Ease({ duration: 1500 })
 
-    const div = document.getElementById('test)
+    const div = document.getElementById('test')
     ease.add(div, { x: 100, y: 200 }, { reverse: true, repeat: true, duration: 2500, ease: 'easeInOutQuad' })
 ```
 
