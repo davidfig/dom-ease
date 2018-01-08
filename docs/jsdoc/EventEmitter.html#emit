@@ -45,6 +45,29 @@
     <ul class="list">
     
         
+        <li class="item" data-name="BLAHBLAH">
+            <span class="title  ">
+                
+                <a href="EventEmitter.html#emit">BLAHBLAH</a>
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="events itemMembers">
+            
+            </ul>
+        </li>
+    
+        
         <li class="item" data-name="DomEase">
             <span class="title  ">
                 
@@ -63,31 +86,31 @@
             
             <span class="subtitle">Methods</span>
             
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">removeAllListeners</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">removeListener</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">once</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">on</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">emit</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">listenerCount</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">listeners</a></li>
+            
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">eventNames</a></li>
+            
                 <li class="parent  " data-name="DomEase#add"><a href="DomEase.html#add">add</a></li>
             
                 <li class="parent  " data-name="DomEase#countElements"><a href="DomEase.html#countElements">countElements</a></li>
             
                 <li class="parent  " data-name="DomEase#countRunning"><a href="DomEase.html#countRunning">countRunning</a></li>
             
-                <li class="  " data-name="DomEase#emit~"><a href="DomEase.html#emit">emit</a></li>
-            
-                <li class="  " data-name="DomEase#eventNames~"><a href="DomEase.html#eventNames">eventNames</a></li>
-            
-                <li class="  " data-name="DomEase#listenerCount~"><a href="DomEase.html#listenerCount">listenerCount</a></li>
-            
-                <li class="  " data-name="DomEase#listeners~"><a href="DomEase.html#listeners">listeners</a></li>
-            
-                <li class="  " data-name="DomEase#once~"><a href="DomEase.html#once">once</a></li>
-            
-                <li class="  " data-name="DomEase#on~"><a href="DomEase.html#on">on</a></li>
-            
                 <li class="parent  " data-name="DomEase#remove"><a href="DomEase.html#remove">remove</a></li>
             
                 <li class="parent  " data-name="DomEase#removeAll"><a href="DomEase.html#removeAll">removeAll</a></li>
-            
-                <li class="  " data-name="DomEase#removeAllListeners~"><a href="DomEase.html#removeAllListeners">removeAllListeners</a></li>
-            
-                <li class="  " data-name="DomEase#removeListener~"><a href="DomEase.html#removeListener">removeListener</a></li>
             
                 <li class="parent  " data-name="DomEase#start"><a href="DomEase.html#start">start</a></li>
             
@@ -130,21 +153,21 @@
             
             <span class="subtitle">Methods</span>
             
-                <li class="  " data-name="DomEaseElement#emit~"><a href="DomEaseElement.html#emit">emit</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">removeAllListeners</a></li>
             
-                <li class="  " data-name="DomEaseElement#eventNames~"><a href="DomEaseElement.html#eventNames">eventNames</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">removeListener</a></li>
             
-                <li class="  " data-name="DomEaseElement#listenerCount~"><a href="DomEaseElement.html#listenerCount">listenerCount</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">once</a></li>
             
-                <li class="  " data-name="DomEaseElement#listeners~"><a href="DomEaseElement.html#listeners">listeners</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">on</a></li>
             
-                <li class="  " data-name="DomEaseElement#once~"><a href="DomEaseElement.html#once">once</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">emit</a></li>
             
-                <li class="  " data-name="DomEaseElement#on~"><a href="DomEaseElement.html#on">on</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">listenerCount</a></li>
             
-                <li class="  " data-name="DomEaseElement#removeAllListeners~"><a href="DomEaseElement.html#removeAllListeners">removeAllListeners</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">listeners</a></li>
             
-                <li class="  " data-name="DomEaseElement#removeListener~"><a href="DomEaseElement.html#removeListener">removeListener</a></li>
+                <li class="  " data-name="BLAHBLAH"><a href="EventEmitter.html#emit">eventNames</a></li>
             
             </ul>
             <ul class="events itemMembers">
@@ -160,56 +183,130 @@
             </ul>
         </li>
     
-        
-    
     </ul>
 </div>
     <div class="main">
-        <h1 class="page-title" data-filename="index.html">Index</h1>
+        <h1 class="page-title" data-filename="EventEmitter.html#emit">Class: EventEmitter</h1>
         
 
 
+
+<section>
+    
+<header>
+    <div class="header content-size">
+        <h2>EventEmitter
+        </h2>
+        
+    </div>
+</header>  
+
+<article class="content-size">
+    <div class="container-overview">
+    
+    
+    
+        
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="emit">
+            <a class="share-icon" href="#emit"><span class="glyphicon glyphicon-link"></span></a>
+            <span class="">
+                new EventEmitter
+            </span>
+            <span class="signature">()</span>
+            
+            
+            
+            
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="node_modules_eventemitter3_index.js.html#line92">index.js:92</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Minimal `EventEmitter` interface that is molded against the Node.js
+`EventEmitter` interface.
+    </div>
     
 
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
 
-    <h3> </h3>
-
-
-
-
-
-
-
+    
+    
 
     
 
+    
+    
+    
+    
+    
+    
+    
+</dd>
 
+    
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
+    
+</article>
 
-    <section>
-        <article class="readme content-size"><h2>dom-ease</h2><p>a simple and super fast DOM animation library</p>
-<h2>rationale</h2><p>This is a simple library to animate DOM objects. It does not have all the bells and whistles of a library like <a target="_blank" href="http://velocityjs.org/">Velocity.js</a>, but it gets the job done with a nice event system.</p>
-<h2>features</h2><p>Here's a list of supported animations:</p>
-<ul>
-<li>top / left in px</li>
-<li>scale</li>
-<li>scaleX / scaleY</li>
-<li>color - one or more colors to cycle through, including the current color</li>
-<li>backgroundColor - one or more background colors to cycle through, including the current color</li>
-<li>width / height in px</li>
-<li>opacity</li>
-</ul>
-<h2>Installation</h2><pre class="prettyprint source"><code>npm i dom-ease</code></pre><h2>Live Demo</h2><p><a target="_blank" href="https://davidfig.github.io/dom-ease/">https://davidfig.github.io/dom-ease/</a></p>
-<h2>API Documentation</h2><p><a target="_blank" href="https://davidfig.github.io/dom-ease/jsdoc">https://davidfig.github.io/dom-ease/jsdoc/</a></p>
-<h2>Simple Usage</h2><pre class="prettyprint source lang-js"><code>    const Ease = require('dom-ease')
-
-    // set up ease
-    const ease = new Ease({ duration: 1500 })
-
-    const div = document.getElementById('test')
-    ease.add(div, { x: 100, y: 200 }, { reverse: true, repeat: true, duration: 2500, ease: 'easeInOutQuad' })</code></pre><h2>License</h2><p>MIT License<br>(c) 2017 <a target="_blank" href="https://yopeyopey.com/">YOPEY YOPEY LLC</a> by <a target="_blank" href="https://twitter.com/yopey_yopey/">David Figatner</a></p></article>
-    </section>
-
+</section>  
 
 
 
@@ -219,7 +316,7 @@
 
         <footer class="content-size">
             <div class="footer">
-                Documentation generated by <a target="_blank" href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 08 2018 23:30:21 GMT+0800 (DST)
+                Documentation generated by <a target="_blank" href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 08 2018 23:12:30 GMT+0800 (DST)
             </div>
         </footer>
     </div>

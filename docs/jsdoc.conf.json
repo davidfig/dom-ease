@@ -30,8 +30,9 @@
         "private": false,
         "lenient": true,
         "destination": "./docs/jsdoc",
-        "template": "./node_modules/@pixi/jsdoc-template"
+        "template": "../yy-jsdoc-template/"
     },
+    "plugins": ["../yy-jsdoc-template/plugins/skip-node_modules"],
     "templates": {
         "default": {
             "outputSourceFiles": true
