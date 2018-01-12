@@ -21072,7 +21072,7 @@ class DomEaseElement extends EventEmitter
         {
             const ease = eases[key]
             ease.time += elapsed
-            const leftover = (ease.time >= ease.duration) ? ease.time - ease.duration : null
+            const leftover = (ease.time >= ease.options.duration) ? ease.time - ease.options.duration : null
             ease.update()
             if (leftover !== null)
             {
