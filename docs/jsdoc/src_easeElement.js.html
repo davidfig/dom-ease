@@ -22,7 +22,7 @@
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
     <link type="text/css" rel="stylesheet" href="styles/main.css">
-    
+
     
     <script>
     var config = {"monospaceLinks":false,"cleverLinks":false,"default":{"outputSourceFiles":true},"applicationName":"dom-ease","footer":"by YOPEY YOPEY LLC (yopeyopey.com)","copyright":"Copyright © 2018 YOPEY YOPEY LLC.","meta":{"title":"dom-ease API Documentation","description":"Documentation for dom-ease library","keyword":"docs, documentation, html5, javascript, jsdoc, dom, ease, animate"}};
@@ -165,7 +165,9 @@
     </ul>
 </div>
     <div class="main">
+        
         <h1 class="page-title" data-filename="src_easeElement.js.html">Source: src/easeElement.js</h1>
+        
         
 
 
@@ -208,53 +210,53 @@ class DomEaseElement extends EventEmitter
          * @member {HTMLElement}
          */
         this.element = element
-        this.animations = {}
+        this.eases = {}
     }
 
-    add(DomEaseElement, options)
+    add(params, options)
     {
-        for (let entry in DomEaseElement)
+        for (let entry in params)
         {
             switch (entry)
             {
                 case 'left':
-                    this.animations['left'] = new Left(this.element, DomEaseElement[entry], options)
+                    this.eases['left'] = new Left(this.element, params[entry], options)
                     break
 
                 case 'top':
-                    this.animations['top'] = new Top(this.element, DomEaseElement[entry], options)
+                    this.eases['top'] = new Top(this.element, params[entry], options)
                     break
 
                 case 'color':
-                    this.animations[entry] = new Color(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new Color(this.element, params[entry], options)
                     break
 
                 case 'backgroundColor':
-                    this.animations[entry] = new BackgroundColor(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new BackgroundColor(this.element, params[entry], options)
                     break
 
                 case 'scale':
-                    this.animations[entry] = new Scale(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new Scale(this.element, params[entry], options)
                     break
 
                 case 'scaleX':
-                    this.animations[entry] = new ScaleX(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new ScaleX(this.element, params[entry], options)
                     break
 
                 case 'scaleY':
-                    this.animations[entry] = new ScaleY(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new ScaleY(this.element, params[entry], options)
                     break
 
                 case 'opacity':
-                    this.animations[entry] = new Opacity(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new Opacity(this.element, params[entry], options)
                     break
 
                 case 'width':
-                    this.animations[entry] = new Width(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new Width(this.element, params[entry], options)
                     break
 
                 case 'height':
-                    this.animations[entry] = new Height(this.element, DomEaseElement[entry], options)
+                    this.eases[entry] = new Height(this.element, params[entry], options)
                     break
 
                 default:
@@ -265,29 +267,34 @@ class DomEaseElement extends EventEmitter
 
     update(elapsed)
     {
-        const animations = this.animations
-        for (let animation in animations)
+        const eases = this.eases
+        for (let key in eases)
         {
-            const DomEaseElement = animations[animation]
-            if (DomEaseElement.update(elapsed))
+            const ease = eases[key]
+            ease.time += elapsed
+            const leftover = (ease.time >= ease.duration) ? ease.time - ease.duration : null
+            ease.update()
+            if (leftover !== null)
             {
-                const options = DomEaseElement.options
+                const options = ease.options
                 if (options.reverse)
                 {
-                    this.emit('loop-' + DomEaseElement.name, DomEaseElement.element)
-                    DomEaseElement.reverse()
+                    this.emit('loop-' + key, ease.element)
+                    ease.reverse()
+                    ease.time = leftover
                     if (!options.repeat)
                     {
                         options.reverse = false
                     }
-                    if (options.repeat !== true)
+                    else if (options.repeat !== true)
                     {
                         options.repeat--
                     }
                 }
-                if (options.repeat)
+                else if (options.repeat)
                 {
-                    DomEaseElement.repeat()
+                    this.emit('loop-' + key, ease.element)
+                    ease.time = leftover
                     if (options.repeat !== true)
                     {
                         options.repeat--
@@ -295,14 +302,14 @@ class DomEaseElement extends EventEmitter
                 }
                 else
                 {
-                    this.emit('complete-' + DomEaseElement.name, DomEaseElement.element)
-                    delete animations[animation]
+                    this.emit('complete-' + key, ease.element)
+                    delete eases[key]
                 }
             }
-            this.emit('each-' + DomEaseElement.name, DomEaseElement.element)
+            this.emit('each-' + key, ease.element)
         }
         this.emit('each', this)
-        if (Object.keys(animations) === 0)
+        if (Object.keys(eases) === 0)
         {
             this.emit('empty', this)
             return true
@@ -344,7 +351,7 @@ module.exports = DomEaseElement</code></pre>
 
         <footer class="content-size">
             <div class="footer">
-                Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 08 2018 23:30:21 GMT+0800 (DST)
+                Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jan 12 2018 11:10:02 GMT+0800 (DST)
             </div>
         </footer>
     </div>
