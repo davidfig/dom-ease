@@ -2,7 +2,6 @@ module.exports = class ScaleY
 {
     constructor(element, y, options)
     {
-        this.name = 'scaleY'
         this.element = element
         this.options = options
         this.to = y
@@ -21,10 +20,9 @@ module.exports = class ScaleY
         this.time = 0
     }
 
-    update(elapsed)
+    update()
     {
         const options = this.options
-        this.time += elapsed
         const scale = options.ease(this.time, this.start, this.delta, options.duration)
         const transform = this.element.style.transform
         const scaleY = transform.indexOf('scaleY')
@@ -41,15 +39,6 @@ module.exports = class ScaleY
         {
             this.element.style.transform = transform.substr(0, scaleY + ('scaleY(').length) + scale + transform.indexOf(')', scaleY)
         }
-        if (this.time >= options.duration)
-        {
-            return true
-        }
-    }
-
-    repeat()
-    {
-        this.time = 0
     }
 
     reverse()

@@ -4,7 +4,6 @@ module.exports = class Opacity
 {
     constructor(element, opacity, options)
     {
-        this.name = 'opacity'
         this.element = element
         this.to = opacity
         this.options = options
@@ -13,20 +12,10 @@ module.exports = class Opacity
         this.time = 0
     }
 
-    update(elapsed)
+    update()
     {
         const options = this.options
-        this.time += elapsed
         this.element.style.opacity = options.ease(this.time, this.start, this.delta, options.duration)
-        if (this.time >= options.duration)
-        {
-            return true
-        }
-    }
-
-    repeat()
-    {
-        this.time = 0
     }
 
     reverse()

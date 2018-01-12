@@ -2,7 +2,6 @@ module.exports = class Left
 {
     constructor(element, x, options)
     {
-        this.name = 'left'
         this.element = element
         this.to = x
         this.options = options
@@ -11,20 +10,10 @@ module.exports = class Left
         this.time = 0
     }
 
-    update(elapsed)
+    update()
     {
         const options = this.options
-        this.time += elapsed
         this.element.style.left = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
-        if (this.time >= options.duration)
-        {
-            return true
-        }
-    }
-
-    repeat()
-    {
-        this.time = 0
     }
 
     reverse()

@@ -2,7 +2,6 @@ module.exports = class Color
 {
     constructor(element, colors, options)
     {
-        this.name = 'color'
         this.element = element
         if (Array.isArray(colors))
         {
@@ -19,25 +18,14 @@ module.exports = class Color
         this.time = 0
     }
 
-    update(elapsed)
+    update()
     {
-        const options = this.options
-        this.time += elapsed
         const i = Math.floor(this.time / this.interval)
         const color = this.colors[i]
         if (this.element.style.color !== color)
         {
             this.element.style.color = this.colors[i]
         }
-        if (this.time >= options.duration)
-        {
-            return true
-        }
-    }
-
-    repeat()
-    {
-        this.time = 0
     }
 
     reverse()

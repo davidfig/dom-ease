@@ -210,10 +210,6 @@ class DomEase extends EventEmitter
         }
         return count
     }
-
-    /**
-     * @var
-     */
 }
 
 /**
@@ -226,10 +222,6 @@ class DomEase extends EventEmitter
  * fires on each loop for a DOM element where there are animations
  * @event DomEase#each
  * @type {DomEase}
- */
-
-/**
- * @external EventEmitter
  */
 
 module.exports = DomEase

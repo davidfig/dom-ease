@@ -2,7 +2,6 @@ module.exports = class Width
 {
     constructor(element, width, options)
     {
-        this.name = 'width'
         this.element = element
         this.to = width
         this.options = options
@@ -11,20 +10,10 @@ module.exports = class Width
         this.time = 0
     }
 
-    update(elapsed)
+    update()
     {
         const options = this.options
-        this.time += elapsed
         this.element.style.width = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
-        if (this.time >= options.duration)
-        {
-            return true
-        }
-    }
-
-    repeat()
-    {
-        this.time = 0
     }
 
     reverse()

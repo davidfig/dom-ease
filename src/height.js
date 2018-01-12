@@ -2,7 +2,6 @@ module.exports = class Height
 {
     constructor(element, height, options)
     {
-        this.name = 'height'
         this.element = element
         this.to = height
         this.options = options
@@ -11,20 +10,10 @@ module.exports = class Height
         this.time = 0
     }
 
-    update(elapsed)
+    update()
     {
         const options = this.options
-        this.time += elapsed
         this.element.style.height = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
-        if (this.time >= options.duration)
-        {
-            return true
-        }
-    }
-
-    repeat()
-    {
-        this.time = 0
     }
 
     reverse()
