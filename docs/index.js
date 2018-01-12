@@ -21240,7 +21240,7 @@ module.exports = class Transform
                 switch (this.entry)
                 {
                     case 'scale': case 'scaleX': case 'scaleY':
-                        return parseFloat(transform.value)
+                        return parseFloat(transform.values)
                 }
             }
         }
