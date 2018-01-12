@@ -1,8 +1,8 @@
 module.exports = class Color
 {
-    constructor(element, colors, options)
+    constructor(style, original, colors, options)
     {
-        this.element = element
+        this.style = style
         if (Array.isArray(colors))
         {
             this.colors = colors
@@ -11,20 +11,19 @@ module.exports = class Color
         {
             this.colors = [colors]
         }
-        this.original = element.style.color
-        colors.push(this.original)
+        colors.push(original)
         this.interval = options.duration / colors.length
         this.options = options
         this.time = 0
     }
 
-    update()
+    update(element)
     {
         const i = Math.floor(this.time / this.interval)
         const color = this.colors[i]
-        if (this.element.style.color !== color)
+        if (element.style[this.style] !== color)
         {
-            this.element.style.color = this.colors[i]
+            element.style[this.style] = this.colors[i]
         }
     }
 

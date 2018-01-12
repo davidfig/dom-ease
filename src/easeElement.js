@@ -1,15 +1,9 @@
 const EventEmitter = require('eventemitter3')
+const exists = require('exists')
 
-const Left = require('./left')
-const Top = require('./top')
 const Color = require('./color')
-const BackgroundColor = require('./backgroundColor')
-const ScaleX = require('./scaleX')
-const ScaleY = require('./scaleY')
-const Scale = require('./scale')
-const Opacity = require('./opacity')
-const Width = require('./width')
-const Height = require('./height')
+const Transform = require('./transform')
+const Number = require('./number')
 
 class DomEaseElement extends EventEmitter
 {
@@ -34,48 +28,49 @@ class DomEaseElement extends EventEmitter
 
     add(params, options)
     {
+        const element = this.element
         for (let entry in params)
         {
             switch (entry)
             {
                 case 'left':
-                    this.eases['left'] = new Left(this.element, params[entry], options)
+                    this.eases['left'] = new Number(entry, element.offsetLeft, params[entry], options, 'px')
                     break
 
                 case 'top':
-                    this.eases['top'] = new Top(this.element, params[entry], options)
+                    this.eases['top'] = new Number(entry, element.offsetTop, params[entry], options, 'px')
                     break
 
                 case 'color':
-                    this.eases[entry] = new Color(this.element, params[entry], options)
+                    this.eases[entry] = new Color('color', element.style.color, params[entry], options)
                     break
 
                 case 'backgroundColor':
-                    this.eases[entry] = new BackgroundColor(this.element, params[entry], options)
+                    this.eases[entry] = new Color('backgroundColor', element.style.backgroundColor, params[entry], options)
                     break
 
                 case 'scale':
-                    this.eases[entry] = new Scale(this.element, params[entry], options)
+                    this.eases[entry] = new Transform(this, entry, params[entry], options)
                     break
 
                 case 'scaleX':
-                    this.eases[entry] = new ScaleX(this.element, params[entry], options)
+                    this.eases[entry] = new Transform(this, entry, params[entry], options)
                     break
 
                 case 'scaleY':
-                    this.eases[entry] = new ScaleY(this.element, params[entry], options)
+                    this.eases[entry] = new Transform(this, entry, params[entry], options)
                     break
 
                 case 'opacity':
-                    this.eases[entry] = new Opacity(this.element, params[entry], options)
+                    this.eases[entry] = new Number(entry, exists(element.opacity) ? parseFloat(element.opacity) : 1, params[entry], options)
                     break
 
                 case 'width':
-                    this.eases[entry] = new Width(this.element, params[entry], options)
+                    this.eases[entry] = new Number(entry, element.offsetWidth, params[entry], options, 'px')
                     break
 
                 case 'height':
-                    this.eases[entry] = new Height(this.element, params[entry], options)
+                    this.eases[entry] = new Number(entry, element.offsetHeight, params[entry], options, 'px')
                     break
 
                 default:
@@ -86,6 +81,8 @@ class DomEaseElement extends EventEmitter
 
     update(elapsed)
     {
+        this.transforms = this.readTransform()
+        const element = this.element
         const eases = this.eases
         for (let key in eases)
         {
@@ -97,7 +94,7 @@ class DomEaseElement extends EventEmitter
                 leftover = ease.time - ease.options.duration
                 ease.time -= leftover
             }
-            ease.update()
+            ease.update(element)
             if (leftover !== null)
             {
                 const options = ease.options
@@ -132,12 +129,76 @@ class DomEaseElement extends EventEmitter
             }
             this.emit('each-' + key, ease.element)
         }
+        this.writeTransform()
         this.emit('each', this)
         if (Object.keys(eases) === 0)
         {
             this.emit('empty', this)
             return true
         }
+    }
+
+    readTransform()
+    {
+        const transforms = []
+        const transform = this.element.style.transform
+        let inside, name = '', values
+        for (let i = 0, _i = transform.length; i < _i; i++)
+        {
+            const letter = transform[i]
+            if (inside)
+            {
+                if (letter === ')')
+                {
+                    inside = false
+                    this.transforms.push({ name, values })
+                    name = ''
+                }
+                else
+                {
+                    values += letter
+                }
+            }
+            else
+            {
+                if (letter === '(')
+                {
+                    values = ''
+                    inside = true
+                }
+                else if (letter !== ' ')
+                {
+                    name += letter
+                }
+            }
+        }
+        return transforms
+    }
+
+    changeTransform(name, values)
+    {
+        const transforms = this.transforms
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            if (transforms[i].name === name)
+            {
+                transforms[i].values = values
+                return
+            }
+        }
+        this.transforms.push({name, values})
+    }
+
+    writeTransform()
+    {
+        const transforms = this.transforms
+        let s = ''
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            const transform = transforms[i]
+            s += transform.name + '(' + transform.values + ')'
+        }
+        this.element.style.transform = s
     }
 }
 

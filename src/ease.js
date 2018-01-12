@@ -21,6 +21,7 @@ class DomEase extends EventEmitter
      * @param {number} [options.duration=1000] default duration
      * @param {(string|function)} [options.ease=penner.linear] default ease
      * @param {(string|function)} [options.autostart=true]
+     * @param {boolean} [options.pauseOnBlur] pause timer on blur, resume on focus
      * @fires DomEase#complete
      * @fires DomEase#each
      */
@@ -36,6 +37,11 @@ class DomEase extends EventEmitter
         {
             this.start()
         }
+        if (options.pauseOnBlur)
+        {
+            window.addEventListener('blur', () => this.blur())
+            window.addEventListener('focus', () => this.focus())
+        }
     }
 
     /**
@@ -48,6 +54,24 @@ class DomEase extends EventEmitter
         {
             this._requested = true
             this.loop()
+            this.running = true
+        }
+    }
+
+    blur()
+    {
+        if (this.running)
+        {
+            this.stop()
+            this.running = true
+        }
+    }
+
+    focus()
+    {
+        if (this.running)
+        {
+            this.start()
         }
     }
 
@@ -71,6 +95,7 @@ class DomEase extends EventEmitter
         {
             window.cancelAnimationFrame(this._requestId)
             this._requested = false
+            this.running = false
         }
     }
 

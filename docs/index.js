@@ -11,7 +11,8 @@ let y = 0, fps = new FPS(), boxes = []
 
 let ease = new Ease({
     duration: 2000,
-    ease: 'easeInOutSine'
+    ease: 'easeInOutSine',
+    pauseOnBlur: true
 })
 
 function create()
@@ -102,7 +103,7 @@ window.onload = function ()
     require('fork-me-github')('https://github.com/davidfig/pixi-ease')
     require('./highlight')()
 }
-},{"../src/ease":200,"./highlight":2,"./html":3,"fork-me-github":6,"yy-fps":196,"yy-random":197}],2:[function(require,module,exports){
+},{"../src/ease":199,"./highlight":2,"./html":3,"fork-me-github":6,"yy-fps":196,"yy-random":197}],2:[function(require,module,exports){
 // shows the code in the demo
 module.exports = function highlight()
 {
@@ -18693,7 +18694,7 @@ if ((typeof module) == 'object' && module.exports) {
   Math    // math: package containing random, pow, and seedrandom
 );
 
-},{"crypto":210}],194:[function(require,module,exports){
+},{"crypto":203}],194:[function(require,module,exports){
 // TinyColor v1.4.1
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -20667,11 +20668,11 @@ class Random
 
 module.exports = new Random()
 },{"seedrandom":186}],198:[function(require,module,exports){
-module.exports = class BackgroundColor
+module.exports = class Color
 {
-    constructor(element, colors, options)
+    constructor(style, original, colors, options)
     {
-        this.element = element
+        this.style = style
         if (Array.isArray(colors))
         {
             this.colors = colors
@@ -20680,20 +20681,19 @@ module.exports = class BackgroundColor
         {
             this.colors = [colors]
         }
-        this.original = element.style.backgroundColor
-        colors.push(this.original)
+        colors.push(original)
         this.interval = options.duration / colors.length
         this.options = options
         this.time = 0
     }
 
-    update()
+    update(element)
     {
         const i = Math.floor(this.time / this.interval)
         const color = this.colors[i]
-        if (this.element.style.backgroundColor !== color)
+        if (element.style[this.style] !== color)
         {
-            this.element.style.backgroundColor = this.colors[i]
+            element.style[this.style] = this.colors[i]
         }
     }
 
@@ -20709,48 +20709,6 @@ module.exports = class BackgroundColor
     }
 }
 },{}],199:[function(require,module,exports){
-module.exports = class Color
-{
-    constructor(element, colors, options)
-    {
-        this.element = element
-        if (Array.isArray(colors))
-        {
-            this.colors = colors
-        }
-        else
-        {
-            this.colors = [colors]
-        }
-        this.original = element.style.color
-        colors.push(this.original)
-        this.interval = options.duration / colors.length
-        this.options = options
-        this.time = 0
-    }
-
-    update()
-    {
-        const i = Math.floor(this.time / this.interval)
-        const color = this.colors[i]
-        if (this.element.style.color !== color)
-        {
-            this.element.style.color = this.colors[i]
-        }
-    }
-
-    reverse()
-    {
-        const reverse = []
-        for (let color in this.colors)
-        {
-            reverse.unshift(this.colors[color])
-        }
-        reverse.push(reverse.shift())
-        this.colors = reverse
-    }
-}
-},{}],200:[function(require,module,exports){
 const EventEmitter = require('eventemitter3')
 const Penner = require('penner')
 const exists = require('exists')
@@ -20774,6 +20732,7 @@ class DomEase extends EventEmitter
      * @param {number} [options.duration=1000] default duration
      * @param {(string|function)} [options.ease=penner.linear] default ease
      * @param {(string|function)} [options.autostart=true]
+     * @param {boolean} [options.pauseOnBlur] pause timer on blur, resume on focus
      * @fires DomEase#complete
      * @fires DomEase#each
      */
@@ -20789,6 +20748,11 @@ class DomEase extends EventEmitter
         {
             this.start()
         }
+        if (options.pauseOnBlur)
+        {
+            window.addEventListener('blur', () => this.blur())
+            window.addEventListener('focus', () => this.focus())
+        }
     }
 
     /**
@@ -20801,6 +20765,24 @@ class DomEase extends EventEmitter
         {
             this._requested = true
             this.loop()
+            this.running = true
+        }
+    }
+
+    blur()
+    {
+        if (this.running)
+        {
+            this.stop()
+            this.running = true
+        }
+    }
+
+    focus()
+    {
+        if (this.running)
+        {
+            this.start()
         }
     }
 
@@ -20824,6 +20806,7 @@ class DomEase extends EventEmitter
         {
             window.cancelAnimationFrame(this._requestId)
             this._requested = false
+            this.running = false
         }
     }
 
@@ -20978,19 +20961,13 @@ class DomEase extends EventEmitter
  */
 
 module.exports = DomEase
-},{"./easeElement":201,"eventemitter3":4,"exists":5,"penner":185}],201:[function(require,module,exports){
+},{"./easeElement":200,"eventemitter3":4,"exists":5,"penner":185}],200:[function(require,module,exports){
 const EventEmitter = require('eventemitter3')
+const exists = require('exists')
 
-const Left = require('./left')
-const Top = require('./top')
 const Color = require('./color')
-const BackgroundColor = require('./backgroundColor')
-const ScaleX = require('./scaleX')
-const ScaleY = require('./scaleY')
-const Scale = require('./scale')
-const Opacity = require('./opacity')
-const Width = require('./width')
-const Height = require('./height')
+const Transform = require('./transform')
+const Number = require('./number')
 
 class DomEaseElement extends EventEmitter
 {
@@ -21015,48 +20992,49 @@ class DomEaseElement extends EventEmitter
 
     add(params, options)
     {
+        const element = this.element
         for (let entry in params)
         {
             switch (entry)
             {
                 case 'left':
-                    this.eases['left'] = new Left(this.element, params[entry], options)
+                    this.eases['left'] = new Number(entry, element.offsetLeft, params[entry], options, 'px')
                     break
 
                 case 'top':
-                    this.eases['top'] = new Top(this.element, params[entry], options)
+                    this.eases['top'] = new Number(entry, element.offsetTop, params[entry], options, 'px')
                     break
 
                 case 'color':
-                    this.eases[entry] = new Color(this.element, params[entry], options)
+                    this.eases[entry] = new Color('color', element.style.color, params[entry], options)
                     break
 
                 case 'backgroundColor':
-                    this.eases[entry] = new BackgroundColor(this.element, params[entry], options)
+                    this.eases[entry] = new Color('backgroundColor', element.style.backgroundColor, params[entry], options)
                     break
 
                 case 'scale':
-                    this.eases[entry] = new Scale(this.element, params[entry], options)
+                    this.eases[entry] = new Transform(this, entry, params[entry], options)
                     break
 
                 case 'scaleX':
-                    this.eases[entry] = new ScaleX(this.element, params[entry], options)
+                    this.eases[entry] = new Transform(this, entry, params[entry], options)
                     break
 
                 case 'scaleY':
-                    this.eases[entry] = new ScaleY(this.element, params[entry], options)
+                    this.eases[entry] = new Transform(this, entry, params[entry], options)
                     break
 
                 case 'opacity':
-                    this.eases[entry] = new Opacity(this.element, params[entry], options)
+                    this.eases[entry] = new Number(entry, exists(element.opacity) ? parseFloat(element.opacity) : 1, params[entry], options)
                     break
 
                 case 'width':
-                    this.eases[entry] = new Width(this.element, params[entry], options)
+                    this.eases[entry] = new Number(entry, element.offsetWidth, params[entry], options, 'px')
                     break
 
                 case 'height':
-                    this.eases[entry] = new Height(this.element, params[entry], options)
+                    this.eases[entry] = new Number(entry, element.offsetHeight, params[entry], options, 'px')
                     break
 
                 default:
@@ -21067,6 +21045,8 @@ class DomEaseElement extends EventEmitter
 
     update(elapsed)
     {
+        this.transforms = this.readTransform()
+        const element = this.element
         const eases = this.eases
         for (let key in eases)
         {
@@ -21078,7 +21058,7 @@ class DomEaseElement extends EventEmitter
                 leftover = ease.time - ease.options.duration
                 ease.time -= leftover
             }
-            ease.update()
+            ease.update(element)
             if (leftover !== null)
             {
                 const options = ease.options
@@ -21113,12 +21093,76 @@ class DomEaseElement extends EventEmitter
             }
             this.emit('each-' + key, ease.element)
         }
+        this.writeTransform()
         this.emit('each', this)
         if (Object.keys(eases) === 0)
         {
             this.emit('empty', this)
             return true
         }
+    }
+
+    readTransform()
+    {
+        const transforms = []
+        const transform = this.element.style.transform
+        let inside, name = '', values
+        for (let i = 0, _i = transform.length; i < _i; i++)
+        {
+            const letter = transform[i]
+            if (inside)
+            {
+                if (letter === ')')
+                {
+                    inside = false
+                    this.transforms.push({ name, values })
+                    name = ''
+                }
+                else
+                {
+                    values += letter
+                }
+            }
+            else
+            {
+                if (letter === '(')
+                {
+                    values = ''
+                    inside = true
+                }
+                else if (letter !== ' ')
+                {
+                    name += letter
+                }
+            }
+        }
+        return transforms
+    }
+
+    changeTransform(name, values)
+    {
+        const transforms = this.transforms
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            if (transforms[i].name === name)
+            {
+                transforms[i].values = values
+                return
+            }
+        }
+        this.transforms.push({name, values})
+    }
+
+    writeTransform()
+    {
+        const transforms = this.transforms
+        let s = ''
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            const transform = transforms[i]
+            s += transform.name + '(' + transform.values + ')'
+        }
+        this.element.style.transform = s
     }
 }
 
@@ -21144,23 +21188,73 @@ class DomEaseElement extends EventEmitter
  */
 
 module.exports = DomEaseElement
-},{"./backgroundColor":198,"./color":199,"./height":202,"./left":203,"./opacity":204,"./scale":205,"./scaleX":206,"./scaleY":207,"./top":208,"./width":209,"eventemitter3":4}],202:[function(require,module,exports){
-module.exports = class Height
+},{"./color":198,"./number":201,"./transform":202,"eventemitter3":4,"exists":5}],201:[function(require,module,exports){
+module.exports = class Number
 {
-    constructor(element, height, options)
+    constructor(entry, start, to, options, units)
     {
-        this.element = element
-        this.to = height
+        this.entry = entry
+        this.to = to
         this.options = options
-        this.start = element.offsetHeight
-        this.delta = this.to - this.start
+        this.start = start
+        this.delta = to - start
+        this.units = units || ''
         this.time = 0
+    }
+
+    update(element)
+    {
+        element.style[this.entry] = this.options.ease(this.time, this.start, this.delta, this.options.duration) + this.units
+    }
+
+    reverse()
+    {
+        const swap = this.to
+        this.to = this.start
+        this.start = swap
+        this.delta = -this.delta
+    }
+}
+},{}],202:[function(require,module,exports){
+module.exports = class Transform
+{
+    constructor(easeElement, entry, to, options)
+    {
+        this.easeElement = easeElement
+        this.entry = entry
+        this.to = to
+        this.options = options
+        this.start = this.calculateStart()
+        this.delta = to - this.start
+        this.time = 0
+    }
+
+    calculateStart()
+    {
+        const transforms = this.easeElement.readTransform()
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            const transform = transforms[i]
+            if (transform.name === this.entry)
+            {
+                switch (this.entry)
+                {
+                    case 'scale': case 'scaleX': case 'scaleY':
+                        return parseFloat(transform.value)
+                }
+            }
+        }
+        switch (this.entry)
+        {
+            case 'scale': case 'scaleX': case 'scaleY':
+                return 1
+        }
+
     }
 
     update()
     {
-        const options = this.options
-        this.element.style.height = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
+        this.easeElement.changeTransform(this.entry, this.options.ease(this.time, this.start, this.delta, this.options.duration))
     }
 
     reverse()
@@ -21172,270 +21266,5 @@ module.exports = class Height
     }
 }
 },{}],203:[function(require,module,exports){
-module.exports = class Left
-{
-    constructor(element, x, options)
-    {
-        this.element = element
-        this.to = x
-        this.options = options
-        this.start = element.offsetLeft
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        this.element.style.left = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],204:[function(require,module,exports){
-const exists = require('exists')
-
-module.exports = class Opacity
-{
-    constructor(element, opacity, options)
-    {
-        this.element = element
-        this.to = opacity
-        this.options = options
-        this.start = exists(element.opacity) ? parseFloat(element.opacity) : 1
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        this.element.style.opacity = options.ease(this.time, this.start, this.delta, options.duration)
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{"exists":5}],205:[function(require,module,exports){
-module.exports = class Scale
-{
-    constructor(element, value, options)
-    {
-        this.element = element
-        this.options = options
-        this.to = value
-        const transform = element.style.transform
-        const scale = transform.indexOf('scale(')
-        if (scale == -1)
-        {
-            this.start = 1
-        }
-        else
-        {
-            const extract = transform.substring(scale + ('scale(').length, transform.indexOf(')', scale))
-            this.start = parseFloat(extract)
-        }
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        const value = options.ease(this.time, this.start, this.delta, options.duration)
-        const transform = this.element.style.transform
-        const scale = transform.indexOf('scale(')
-        if (!transform)
-        {
-            this.element.style.transform = 'scale(' + value + ')'
-        }
-        else if (scale == -1)
-        {
-            this.element.style.transform += ' scale(' + value + ')'
-        }
-        else
-        {
-            this.element.style.transform = transform.substr(0, scale + ('scale(').length) + value + transform.substr(transform.indexOf(')'))
-        }
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],206:[function(require,module,exports){
-module.exports = class ScaleX
-{
-    constructor(element, x, options)
-    {
-        this.element = element
-        this.options = options
-        this.to = x
-        const transform = element.style.transform
-        const scaleX = transform.indexOf('scaleX')
-        if (scaleX == -1)
-        {
-            this.start = 1
-        }
-        else
-        {
-            const extract = transform.substring(scaleX + ('scaleX').length + 1, transform.indexOf(')', scaleX))
-            this.start = parseFloat(extract)
-        }
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        const scale = options.ease(this.time, this.start, this.delta, options.duration)
-        const transform = this.element.style.transform
-        const scaleX = transform.indexOf('scaleX')
-
-        if (!transform)
-        {
-            this.element.style.transform = 'scaleX(' + scale + ')'
-        }
-        else if (scaleX == -1)
-        {
-            this.element.style.transform += ' scaleX(' + scale + ')'
-        }
-        else
-        {
-            this.element.style.transform = transform.substr(0, scaleX + ('scaleX(').length) + scale + transform.indexOf(')', scaleX)
-        }
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],207:[function(require,module,exports){
-module.exports = class ScaleY
-{
-    constructor(element, y, options)
-    {
-        this.element = element
-        this.options = options
-        this.to = y
-        const transform = element.style.transform
-        const scaleY = transform.indexOf('scaleY')
-        if (scaleY == -1)
-        {
-            this.start = 1
-        }
-        else
-        {
-            const extract = transform.substring(scaleY + ('scaleY').length + 1, transform.indexOf(')', scaleY))
-            this.start = parseFloat(extract)
-        }
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        const scale = options.ease(this.time, this.start, this.delta, options.duration)
-        const transform = this.element.style.transform
-        const scaleY = transform.indexOf('scaleY')
-
-        if (!transform)
-        {
-            this.element.style.transform = 'scaleY(' + scale + ')'
-        }
-        else if (scaleY == -1)
-        {
-            this.element.style.transform += ' scaleY(' + scale + ')'
-        }
-        else
-        {
-            this.element.style.transform = transform.substr(0, scaleY + ('scaleY(').length) + scale + transform.indexOf(')', scaleY)
-        }
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],208:[function(require,module,exports){
-module.exports = class Top
-{
-    constructor(element, y, options)
-    {
-        this.element = element
-        this.to = y
-        this.options = options
-        this.start = element.offsetTop
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        this.element.style.top = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],209:[function(require,module,exports){
-module.exports = class Width
-{
-    constructor(element, width, options)
-    {
-        this.element = element
-        this.to = width
-        this.options = options
-        this.start = element.offsetWidth
-        this.delta = this.to - this.start
-        this.time = 0
-    }
-
-    update()
-    {
-        const options = this.options
-        this.element.style.width = options.ease(this.time, this.start, this.delta, options.duration) + 'px'
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],210:[function(require,module,exports){
 
 },{}]},{},[1]);

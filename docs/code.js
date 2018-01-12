@@ -10,7 +10,8 @@ let y = 0, fps = new FPS(), boxes = []
 
 let ease = new Ease({
     duration: 2000,
-    ease: 'easeInOutSine'
+    ease: 'easeInOutSine',
+    pauseOnBlur: true
 })
 
 function create()
