@@ -151,7 +151,7 @@ class DomEaseElement extends EventEmitter
                 if (letter === ')')
                 {
                     inside = false
-                    this.transforms.push({ name, values })
+                    transforms.push({ name, values })
                     name = ''
                 }
                 else
