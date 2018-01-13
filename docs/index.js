@@ -152,7 +152,9 @@ var DomEase = function (_EventEmitter) {
             if (typeof options.ease === 'string') {
                 options.ease = Penner[options.ease];
             }
-            this.list.push(new Ease(element, params, options));
+            var ease = new Ease(element, params, options);
+            this.list.push(ease);
+            return ease;
         }
 
         /**

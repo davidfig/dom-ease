@@ -129,7 +129,9 @@ class DomEase extends EventEmitter
         {
             options.ease = Penner[options.ease]
         }
-        this.list.push(new Ease(element, params, options))
+        const ease = new Ease(element, params, options)
+        this.list.push(ease)
+        return ease
     }
 
     /**
