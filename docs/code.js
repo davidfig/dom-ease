@@ -3,7 +3,7 @@ const FPS = require('yy-fps')
 
 const html = require('./html')
 
-const Ease = require('../src/list')
+const Ease = require('../dist/domEase')
 
 const SIZE = 75
 let y = 0, fps = new FPS(), boxes = []

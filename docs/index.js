@@ -1,10 +1,621 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var EventEmitter = require('eventemitter3');
+var Penner = require('penner');
+var exists = require('exists');
+
+var Ease = require('./ease');
+
+/**
+ * Manages all eases
+ * @extends EventEmitter
+ * @example
+ * var Ease = require('dom-ease');
+ * var ease = new Ease({ duration: 3000, ease: 'easeInOutSine' });
+ *
+ * var test = document.getElementById('test')
+ * ease.add(test, { left: 20, top: 15, opacity: 0.25 }, { repeat: true, reverse: true })
+ */
+
+var DomEase = function (_EventEmitter) {
+    _inherits(DomEase, _EventEmitter);
+
+    /**
+     * @param {object} [options]
+     * @param {number} [options.duration=1000] default duration
+     * @param {(string|function)} [options.ease=penner.linear] default ease
+     * @param {(string|function)} [options.autostart=true]
+     * @param {boolean} [options.pauseOnBlur] pause timer on blur, resume on focus
+     * @fires DomEase#each
+     * @fires DomEase#complete
+     */
+    function DomEase(options) {
+        _classCallCheck(this, DomEase);
+
+        var _this = _possibleConstructorReturn(this, (DomEase.__proto__ || Object.getPrototypeOf(DomEase)).call(this));
+
+        _this.options = options || {};
+        _this.options.duration = _this.options.duration || 1000;
+        _this.options.ease = _this.options.ease || Penner.linear;
+        _this.list = [];
+        _this.empty = true;
+        if (!options.autostart) {
+            _this.start();
+        }
+        if (options.pauseOnBlur) {
+            window.addEventListener('blur', function () {
+                return _this.blur();
+            });
+            window.addEventListener('focus', function () {
+                return _this.focus();
+            });
+        }
+        return _this;
+    }
+
+    /**
+     * start animation loop (automatically called unless options.autostart=false)
+     */
+
+
+    _createClass(DomEase, [{
+        key: 'start',
+        value: function start() {
+            if (!this._requested) {
+                this._requested = true;
+                this.loop();
+                this.running = true;
+            }
+        }
+    }, {
+        key: 'blur',
+        value: function blur() {
+            if (this.running) {
+                this.stop();
+                this.running = true;
+            }
+        }
+    }, {
+        key: 'focus',
+        value: function focus() {
+            if (this.running) {
+                this.start();
+            }
+        }
+    }, {
+        key: 'loop',
+        value: function loop(time) {
+            var _this2 = this;
+
+            if (time) {
+                var elapsed = this._last ? time - this._last : 0;
+                this.update(elapsed);
+            }
+            this._last = time;
+            this._requestId = window.requestAnimationFrame(function (time) {
+                return _this2.loop(time);
+            });
+        }
+
+        /**
+         * stop animation loop
+         */
+
+    }, {
+        key: 'stop',
+        value: function stop() {
+            if (this._requested) {
+                window.cancelAnimationFrame(this._requestId);
+                this._requested = false;
+                this.running = false;
+            }
+        }
+
+        /**
+         * add eases
+         * @param {HTMLElement} element
+         * @param {object} params
+         * @param {number} [params.left] in px
+         * @param {number} [params.top] in px
+         * @param {number} [params.width] in px
+         * @param {number} [params.height] in px
+         * @param {number} [params.scale]
+         * @param {number} [params.scaleX]
+         * @param {number} [params.scaleY]
+         * @param {number} [params.opacity]
+         * @param {(color|color[])} [params.color]
+         * @param {(color|color[])} [params.backgroundColor]
+         * @param {object} [options]
+         * @param {number} [options.duration]
+         * @param {(string|function)} [options.ease]
+         * @param {(boolean|number)} [options.repeat]
+         * @param {boolean} [options.reverse]
+         * @returns {Ease}
+         */
+
+    }, {
+        key: 'add',
+        value: function add(element, params, options) {
+            // set up default options
+            options = options || {};
+            options.duration = exists(options.duration) ? options.duration : this.options.duration;
+            options.ease = options.ease || this.options.ease;
+            if (typeof options.ease === 'string') {
+                options.ease = Penner[options.ease];
+            }
+            this.list.push(new Ease(element, params, options));
+        }
+
+        /**
+         * remove all eases on element
+         * @param {HTMLElement} element
+         */
+
+    }, {
+        key: 'removeObjectEases',
+        value: function removeObjectEases(element) {
+            var list = this.list;
+            for (var i = 0, _i = list.length; i < _i; i++) {
+                var ease = list[i];
+                if (ease.element === element) {
+                    list.splice(i, 1);
+                    i--;
+                    _i--;
+                }
+            }
+        }
+
+        /**
+         * remove eases using Ease object returned by add()
+         * @param {Ease} ease
+         */
+
+    }, {
+        key: 'remove',
+        value: function remove(ease) {
+            var list = this.list;
+            for (var i = 0, _i = list.length; i < _i; i++) {
+                if (list[i] === ease) {
+                    list.splice(i, 1);
+                    return;
+                }
+            }
+        }
+
+        /**
+         * remove all eases
+         */
+
+    }, {
+        key: 'removeAll',
+        value: function removeAll() {
+            this.list = [];
+        }
+
+        /**
+         * update frame; this is called automatically if start() is used
+         * @param {number} elapsed time in ms
+         */
+
+    }, {
+        key: 'update',
+        value: function update(elapsed) {
+            for (var i = 0, _i = this.list.length; i < _i; i++) {
+                if (this.list[i].update(elapsed)) {
+                    this.list.splice(i, 1);
+                    i--;
+                    _i--;
+                }
+            }
+            this.emit('each', this);
+            if (!this.empty && this.list.length === 0) {
+                this.emit('done', this);
+                this.empty = true;
+            }
+        }
+
+        /**
+         * number of eases
+         * @returns {number}
+         */
+
+    }, {
+        key: 'getCount',
+        value: function getCount() {
+            return this.list.length;
+        }
+    }]);
+
+    return DomEase;
+}(EventEmitter);
+
+/**
+ * fires when there are no more animations for a DOM element
+ * @event DomEase#complete
+ * @type {DomEase}
+ */
+
+/**
+ * fires on each loop for a DOM element where there are animations
+ * @event DomEase#each
+ * @type {DomEase}
+ */
+
+module.exports = DomEase;
+
+},{"./ease":2,"eventemitter3":6,"exists":7,"penner":187}],2:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var EventEmitter = require('eventemitter3');
+var exists = require('exists');
+
+var Ease = function (_EventEmitter) {
+    _inherits(Ease, _EventEmitter);
+
+    /**
+     * Ease class returned by DomEase.add()
+     * @extends EventEmitter
+     * @param {HTMLElement} element
+     * @param {object} params
+     * @param {number} [params.left] in px
+     * @param {number} [params.top] in px
+     * @param {number} [params.width] in px
+     * @param {number} [params.height] in px
+     * @param {number} [params.scale]
+     * @param {number} [params.scaleX]
+     * @param {number} [params.scaleY]
+     * @param {number} [params.opacity]
+     * @param {(color|color[])} [params.color]
+     * @param {(color|color[])} [params.backgroundColor]
+     * @param {object} [options]
+     * @param {number} [options.duration]
+     * @param {(string|function)} [options.ease]
+     * @param {(boolean|number)} [options.repeat]
+     * @param {boolean} [options.reverse]
+     * @returns {Ease}
+     * @fires Ease#each
+     * @fires Ease#complete
+     * @fires Ease#loop
+     * @hideconstructor
+     */
+    function Ease(element, params, options) {
+        _classCallCheck(this, Ease);
+
+        var _this = _possibleConstructorReturn(this, (Ease.__proto__ || Object.getPrototypeOf(Ease)).call(this));
+
+        _this.element = element;
+        _this.list = [];
+        _this.time = 0;
+        _this.duration = options.duration;
+        _this.ease = options.ease;
+        _this.repeat = options.repeat;
+        _this.reverse = options.reverse;
+        for (var entry in params) {
+            switch (entry) {
+                case 'left':
+                    _this.numberStart(entry, element.offsetLeft, params[entry], 'px');
+                    break;
+
+                case 'top':
+                    _this.numberStart(entry, element.offsetTop, params[entry], 'px');
+                    break;
+
+                case 'color':
+                    _this.colorStart('color', element.style.color, params[entry]);
+                    break;
+
+                case 'backgroundColor':
+                    _this.colorStart('backgroundColor', element.style.backgroundColor, params[entry]);
+                    break;
+
+                case 'scale':
+                    _this.transformStart(entry, params[entry]);
+                    break;
+
+                case 'scaleX':
+                    _this.transformStart(entry, params[entry]);
+                    break;
+
+                case 'scaleY':
+                    _this.transformStart(entry, params[entry]);
+                    break;
+
+                case 'opacity':
+                    _this.numberStart(entry, exists(element.opacity) ? parseFloat(element.opacity) : 1, params[entry]);
+                    break;
+
+                case 'width':
+                    _this.numberStart(entry, element.offsetWidth, params[entry], 'px');
+                    break;
+
+                case 'height':
+                    _this.numberStart(entry, element.offsetHeight, params[entry], 'px');
+                    break;
+
+                default:
+                    console.warn(entry + ' not setup for animation in dom-ease.');
+            }
+        }
+        return _this;
+    }
+
+    /**
+     * create number entry
+     * @private
+     * @param {string} entry
+     * @param {number} start
+     * @param {number} to
+     * @param {string} [units]
+     */
+
+
+    _createClass(Ease, [{
+        key: 'numberStart',
+        value: function numberStart(entry, start, to, units) {
+            var ease = { type: 'number', entry: entry, to: to, start: start, delta: to - start, units: units || '' };
+            this.list.push(ease);
+        }
+    }, {
+        key: 'numberUpdate',
+        value: function numberUpdate(ease, percent) {
+            this.element.style[ease.entry] = ease.start + ease.delta * percent + ease.units;
+        }
+
+        /**
+         * reverse number and transform
+         * @private
+         * @param {object} ease
+         */
+
+    }, {
+        key: 'easeReverse',
+        value: function easeReverse(ease) {
+            var swap = ease.to;
+            ease.to = ease.start;
+            ease.start = swap;
+            ease.delta = -ease.delta;
+        }
+    }, {
+        key: 'transformStart',
+        value: function transformStart(entry, to) {
+            var ease = { type: 'transform', entry: entry, to: to };
+            if (!this.transforms) {
+                this.readTransform();
+            }
+            var transforms = this.transforms;
+            var found = void 0;
+            for (var i = 0, _i = transforms.length; i < _i; i++) {
+                var transform = transforms[i];
+                if (transform.name === entry) {
+                    switch (entry) {
+                        case 'scale':case 'scaleX':case 'scaleY':
+                            ease.start = parseFloat(transform.values);
+                            break;
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                switch (entry) {
+                    case 'scale':case 'scaleX':case 'scaleY':
+                        ease.start = 1;
+                }
+            }
+            ease.delta = to - ease.start;
+            this.list.push(ease);
+        }
+    }, {
+        key: 'transformUpdate',
+        value: function transformUpdate(ease, percent) {
+            if (!this.changedTransform) {
+                this.readTransform();
+                this.changedTransform = true;
+            }
+            var name = ease.entry;
+            var transforms = this.transforms;
+            var values = ease.start + ease.delta * percent;
+            for (var i = 0, _i = transforms.length; i < _i; i++) {
+                if (transforms[i].name === name) {
+                    transforms[i].values = values;
+                    return;
+                }
+            }
+            this.transforms.push({ name: name, values: values });
+        }
+    }, {
+        key: 'colorUpdate',
+        value: function colorUpdate(ease) {
+            var elementStyle = this.element.style;
+            var style = ease.style;
+            var colors = ease.colors;
+            var i = Math.floor(this.time / ease.interval);
+            var color = colors[i];
+            if (elementStyle[style] !== color) {
+                elementStyle[style] = colors[i];
+            }
+        }
+    }, {
+        key: 'colorReverse',
+        value: function colorReverse(ease) {
+            var reverse = [];
+            var colors = ease.colors;
+            for (var color in colors) {
+                reverse.unshift(colors[color]);
+            }
+            reverse.push(reverse.shift());
+            ease.colors = reverse;
+        }
+    }, {
+        key: 'colorStart',
+        value: function colorStart(style, original, colors) {
+            var ease = { type: 'color', style: style };
+            if (Array.isArray(colors)) {
+                ease.colors = colors;
+            } else {
+                ease.colors = [colors];
+            }
+            colors.push(original);
+            ease.interval = this.duration / colors.length;
+            this.list.push(ease);
+        }
+    }, {
+        key: 'update',
+        value: function update(elapsed) {
+            this.changedTransform = false;
+            var list = this.list;
+            var leftover = null;
+            this.time += elapsed;
+            if (this.time >= this.duration) {
+                leftover = this.time - this.duration;
+                this.time -= leftover;
+            }
+            var percent = this.ease(this.time, 0, 1, this.duration);
+            for (var i = 0, _i = list.length; i < _i; i++) {
+                var ease = list[i];
+                switch (ease.type) {
+                    case 'number':
+                        this.numberUpdate(ease, percent);
+                        break;
+
+                    case 'color':
+                        this.colorUpdate(ease);
+                        break;
+
+                    case 'transform':
+                        this.transformUpdate(ease, percent);
+                        break;
+                }
+            }
+            if (this.changedTransform) {
+                this.writeTransform();
+            }
+            this.emit('each', this);
+
+            // handle end of duration
+            if (leftover !== null) {
+                if (this.reverse) {
+                    this.reverseEases();
+                    this.time = leftover;
+                    this.emit('loop', this);
+                    if (!this.repeat) {
+                        this.reverse = false;
+                    } else if (this.repeat !== true) {
+                        this.repeat--;
+                    }
+                } else if (this.repeat) {
+                    this.emit('loop', this);
+                    this.time = leftover;
+                    if (this.repeat !== true) {
+                        this.repeat--;
+                    }
+                } else {
+                    this.emit('complete', this);
+                    return true;
+                }
+            }
+        }
+    }, {
+        key: 'reverseEases',
+        value: function reverseEases() {
+            var list = this.list;
+            for (var i = 0, _i = list.length; i < _i; i++) {
+                var ease = list[i];
+                if (ease.type === 'color') {
+                    this.colorReverse(ease);
+                } else {
+                    this.easeReverse(ease);
+                }
+            }
+        }
+    }, {
+        key: 'readTransform',
+        value: function readTransform() {
+            this.transforms = [];
+            var transform = this.element.style.transform;
+            var inside = void 0,
+                name = '',
+                values = void 0;
+            for (var i = 0, _i = transform.length; i < _i; i++) {
+                var letter = transform[i];
+                if (inside) {
+                    if (letter === ')') {
+                        inside = false;
+                        this.transforms.push({ name: name, values: values });
+                        name = '';
+                    } else {
+                        values += letter;
+                    }
+                } else {
+                    if (letter === '(') {
+                        values = '';
+                        inside = true;
+                    } else if (letter !== ' ') {
+                        name += letter;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'writeTransform',
+        value: function writeTransform() {
+            var transforms = this.transforms;
+            var s = '';
+            for (var i = 0, _i = transforms.length; i < _i; i++) {
+                var transform = transforms[i];
+                s += transform.name + '(' + transform.values + ')';
+            }
+            this.element.style.transform = s;
+        }
+    }]);
+
+    return Ease;
+}(EventEmitter);
+
+/**
+ * fires when eases are complete
+ * @event Ease#complete
+ * @type {Ease}
+ */
+
+/**
+ * fires on each loop while eases are running
+ * @event Ease#each
+ * @type {Ease}
+ */
+
+/**
+ * fires when eases repeat or reverse
+ * @event Ease#loop
+ * @type {Ease}
+ */
+
+module.exports = Ease;
+
+},{"eventemitter3":6,"exists":7}],3:[function(require,module,exports){
 const Random = require('yy-random')
 const FPS = require('yy-fps')
 
 const html = require('./html')
 
-const Ease = require('../src/ease')
+const Ease = require('../dist/domEase')
 
 const SIZE = 75
 let y = 0, fps = new FPS(), boxes = []
@@ -103,7 +714,7 @@ window.onload = function ()
     require('fork-me-github')('https://github.com/davidfig/pixi-ease')
     require('./highlight')()
 }
-},{"../src/ease":199,"./highlight":2,"./html":3,"fork-me-github":6,"yy-fps":196,"yy-random":197}],2:[function(require,module,exports){
+},{"../dist/domEase":1,"./highlight":4,"./html":5,"fork-me-github":8,"yy-fps":198,"yy-random":199}],4:[function(require,module,exports){
 // shows the code in the demo
 module.exports = function highlight()
 {
@@ -117,7 +728,7 @@ module.exports = function highlight()
     }
     client.send()
 }
-},{"highlight.js":8}],3:[function(require,module,exports){
+},{"highlight.js":10}],5:[function(require,module,exports){
 module.exports = function create(options)
 {
     options = options || {}
@@ -139,7 +750,7 @@ module.exports = function create(options)
     }
     return object
 }
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var has = Object.prototype.hasOwnProperty
@@ -477,7 +1088,7 @@ if ('undefined' !== typeof module) {
   module.exports = EventEmitter;
 }
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = exists;
 
 module.exports.allExist = allExist;
@@ -490,7 +1101,7 @@ function allExist (/* vals */) {
   var vals = Array.prototype.slice.call(arguments);
   return vals.every(exists);
 }
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // Programatically add fork me on github ribbon from javascript without making changes to CSS, HTML, or adding image files
 // by David Figatner
 // copyright 2017 YOPEY YOPEY LLC
@@ -644,7 +1255,7 @@ module.exports = function forkMe(url, options)
     sheet.insertRule('.' + a.className + '::before' + before + '}')
     sheet.insertRule('.' + a.className + '::after' + after + '}')
 }
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*
 Syntax highlighting with language autodetection.
 https://highlightjs.org/
@@ -1462,7 +2073,7 @@ https://highlightjs.org/
   return hljs;
 }));
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var hljs = require('./highlight');
 
 hljs.registerLanguage('1c', require('./languages/1c'));
@@ -1643,7 +2254,7 @@ hljs.registerLanguage('xquery', require('./languages/xquery'));
 hljs.registerLanguage('zephir', require('./languages/zephir'));
 
 module.exports = hljs;
-},{"./highlight":7,"./languages/1c":9,"./languages/abnf":10,"./languages/accesslog":11,"./languages/actionscript":12,"./languages/ada":13,"./languages/apache":14,"./languages/applescript":15,"./languages/arduino":16,"./languages/armasm":17,"./languages/asciidoc":18,"./languages/aspectj":19,"./languages/autohotkey":20,"./languages/autoit":21,"./languages/avrasm":22,"./languages/awk":23,"./languages/axapta":24,"./languages/bash":25,"./languages/basic":26,"./languages/bnf":27,"./languages/brainfuck":28,"./languages/cal":29,"./languages/capnproto":30,"./languages/ceylon":31,"./languages/clean":32,"./languages/clojure":34,"./languages/clojure-repl":33,"./languages/cmake":35,"./languages/coffeescript":36,"./languages/coq":37,"./languages/cos":38,"./languages/cpp":39,"./languages/crmsh":40,"./languages/crystal":41,"./languages/cs":42,"./languages/csp":43,"./languages/css":44,"./languages/d":45,"./languages/dart":46,"./languages/delphi":47,"./languages/diff":48,"./languages/django":49,"./languages/dns":50,"./languages/dockerfile":51,"./languages/dos":52,"./languages/dsconfig":53,"./languages/dts":54,"./languages/dust":55,"./languages/ebnf":56,"./languages/elixir":57,"./languages/elm":58,"./languages/erb":59,"./languages/erlang":61,"./languages/erlang-repl":60,"./languages/excel":62,"./languages/fix":63,"./languages/flix":64,"./languages/fortran":65,"./languages/fsharp":66,"./languages/gams":67,"./languages/gauss":68,"./languages/gcode":69,"./languages/gherkin":70,"./languages/glsl":71,"./languages/go":72,"./languages/golo":73,"./languages/gradle":74,"./languages/groovy":75,"./languages/haml":76,"./languages/handlebars":77,"./languages/haskell":78,"./languages/haxe":79,"./languages/hsp":80,"./languages/htmlbars":81,"./languages/http":82,"./languages/hy":83,"./languages/inform7":84,"./languages/ini":85,"./languages/irpf90":86,"./languages/java":87,"./languages/javascript":88,"./languages/jboss-cli":89,"./languages/json":90,"./languages/julia":92,"./languages/julia-repl":91,"./languages/kotlin":93,"./languages/lasso":94,"./languages/ldif":95,"./languages/leaf":96,"./languages/less":97,"./languages/lisp":98,"./languages/livecodeserver":99,"./languages/livescript":100,"./languages/llvm":101,"./languages/lsl":102,"./languages/lua":103,"./languages/makefile":104,"./languages/markdown":105,"./languages/mathematica":106,"./languages/matlab":107,"./languages/maxima":108,"./languages/mel":109,"./languages/mercury":110,"./languages/mipsasm":111,"./languages/mizar":112,"./languages/mojolicious":113,"./languages/monkey":114,"./languages/moonscript":115,"./languages/n1ql":116,"./languages/nginx":117,"./languages/nimrod":118,"./languages/nix":119,"./languages/nsis":120,"./languages/objectivec":121,"./languages/ocaml":122,"./languages/openscad":123,"./languages/oxygene":124,"./languages/parser3":125,"./languages/perl":126,"./languages/pf":127,"./languages/php":128,"./languages/pony":129,"./languages/powershell":130,"./languages/processing":131,"./languages/profile":132,"./languages/prolog":133,"./languages/protobuf":134,"./languages/puppet":135,"./languages/purebasic":136,"./languages/python":137,"./languages/q":138,"./languages/qml":139,"./languages/r":140,"./languages/rib":141,"./languages/roboconf":142,"./languages/routeros":143,"./languages/rsl":144,"./languages/ruby":145,"./languages/ruleslanguage":146,"./languages/rust":147,"./languages/scala":148,"./languages/scheme":149,"./languages/scilab":150,"./languages/scss":151,"./languages/shell":152,"./languages/smali":153,"./languages/smalltalk":154,"./languages/sml":155,"./languages/sqf":156,"./languages/sql":157,"./languages/stan":158,"./languages/stata":159,"./languages/step21":160,"./languages/stylus":161,"./languages/subunit":162,"./languages/swift":163,"./languages/taggerscript":164,"./languages/tap":165,"./languages/tcl":166,"./languages/tex":167,"./languages/thrift":168,"./languages/tp":169,"./languages/twig":170,"./languages/typescript":171,"./languages/vala":172,"./languages/vbnet":173,"./languages/vbscript":175,"./languages/vbscript-html":174,"./languages/verilog":176,"./languages/vhdl":177,"./languages/vim":178,"./languages/x86asm":179,"./languages/xl":180,"./languages/xml":181,"./languages/xquery":182,"./languages/yaml":183,"./languages/zephir":184}],9:[function(require,module,exports){
+},{"./highlight":9,"./languages/1c":11,"./languages/abnf":12,"./languages/accesslog":13,"./languages/actionscript":14,"./languages/ada":15,"./languages/apache":16,"./languages/applescript":17,"./languages/arduino":18,"./languages/armasm":19,"./languages/asciidoc":20,"./languages/aspectj":21,"./languages/autohotkey":22,"./languages/autoit":23,"./languages/avrasm":24,"./languages/awk":25,"./languages/axapta":26,"./languages/bash":27,"./languages/basic":28,"./languages/bnf":29,"./languages/brainfuck":30,"./languages/cal":31,"./languages/capnproto":32,"./languages/ceylon":33,"./languages/clean":34,"./languages/clojure":36,"./languages/clojure-repl":35,"./languages/cmake":37,"./languages/coffeescript":38,"./languages/coq":39,"./languages/cos":40,"./languages/cpp":41,"./languages/crmsh":42,"./languages/crystal":43,"./languages/cs":44,"./languages/csp":45,"./languages/css":46,"./languages/d":47,"./languages/dart":48,"./languages/delphi":49,"./languages/diff":50,"./languages/django":51,"./languages/dns":52,"./languages/dockerfile":53,"./languages/dos":54,"./languages/dsconfig":55,"./languages/dts":56,"./languages/dust":57,"./languages/ebnf":58,"./languages/elixir":59,"./languages/elm":60,"./languages/erb":61,"./languages/erlang":63,"./languages/erlang-repl":62,"./languages/excel":64,"./languages/fix":65,"./languages/flix":66,"./languages/fortran":67,"./languages/fsharp":68,"./languages/gams":69,"./languages/gauss":70,"./languages/gcode":71,"./languages/gherkin":72,"./languages/glsl":73,"./languages/go":74,"./languages/golo":75,"./languages/gradle":76,"./languages/groovy":77,"./languages/haml":78,"./languages/handlebars":79,"./languages/haskell":80,"./languages/haxe":81,"./languages/hsp":82,"./languages/htmlbars":83,"./languages/http":84,"./languages/hy":85,"./languages/inform7":86,"./languages/ini":87,"./languages/irpf90":88,"./languages/java":89,"./languages/javascript":90,"./languages/jboss-cli":91,"./languages/json":92,"./languages/julia":94,"./languages/julia-repl":93,"./languages/kotlin":95,"./languages/lasso":96,"./languages/ldif":97,"./languages/leaf":98,"./languages/less":99,"./languages/lisp":100,"./languages/livecodeserver":101,"./languages/livescript":102,"./languages/llvm":103,"./languages/lsl":104,"./languages/lua":105,"./languages/makefile":106,"./languages/markdown":107,"./languages/mathematica":108,"./languages/matlab":109,"./languages/maxima":110,"./languages/mel":111,"./languages/mercury":112,"./languages/mipsasm":113,"./languages/mizar":114,"./languages/mojolicious":115,"./languages/monkey":116,"./languages/moonscript":117,"./languages/n1ql":118,"./languages/nginx":119,"./languages/nimrod":120,"./languages/nix":121,"./languages/nsis":122,"./languages/objectivec":123,"./languages/ocaml":124,"./languages/openscad":125,"./languages/oxygene":126,"./languages/parser3":127,"./languages/perl":128,"./languages/pf":129,"./languages/php":130,"./languages/pony":131,"./languages/powershell":132,"./languages/processing":133,"./languages/profile":134,"./languages/prolog":135,"./languages/protobuf":136,"./languages/puppet":137,"./languages/purebasic":138,"./languages/python":139,"./languages/q":140,"./languages/qml":141,"./languages/r":142,"./languages/rib":143,"./languages/roboconf":144,"./languages/routeros":145,"./languages/rsl":146,"./languages/ruby":147,"./languages/ruleslanguage":148,"./languages/rust":149,"./languages/scala":150,"./languages/scheme":151,"./languages/scilab":152,"./languages/scss":153,"./languages/shell":154,"./languages/smali":155,"./languages/smalltalk":156,"./languages/sml":157,"./languages/sqf":158,"./languages/sql":159,"./languages/stan":160,"./languages/stata":161,"./languages/step21":162,"./languages/stylus":163,"./languages/subunit":164,"./languages/swift":165,"./languages/taggerscript":166,"./languages/tap":167,"./languages/tcl":168,"./languages/tex":169,"./languages/thrift":170,"./languages/tp":171,"./languages/twig":172,"./languages/typescript":173,"./languages/vala":174,"./languages/vbnet":175,"./languages/vbscript":177,"./languages/vbscript-html":176,"./languages/verilog":178,"./languages/vhdl":179,"./languages/vim":180,"./languages/x86asm":181,"./languages/xl":182,"./languages/xml":183,"./languages/xquery":184,"./languages/yaml":185,"./languages/zephir":186}],11:[function(require,module,exports){
 module.exports = function(hljs){
 
   // общий паттерн для определения идентификаторов
@@ -2153,7 +2764,7 @@ module.exports = function(hljs){
     ]  
   }
 };
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = function(hljs) {
     var regexes = {
         ruleDeclaration: "^[a-zA-Z][a-zA-Z0-9-]*",
@@ -2224,7 +2835,7 @@ module.exports = function(hljs) {
       ]
     };
 };
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -2262,7 +2873,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z_$][a-zA-Z0-9_$]*';
   var IDENT_FUNC_RETURN_TYPE_RE = '([*]|[a-zA-Z_$][a-zA-Z0-9_$]*)';
@@ -2336,7 +2947,7 @@ module.exports = function(hljs) {
     illegal: /#/
   };
 };
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = // We try to support full Ada2012
 //
 // We highlight all appearances of types, keywords, literals (string, char, number, bool)
@@ -2509,7 +3120,7 @@ function(hljs) {
         ]
     };
 };
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUMBER = {className: 'number', begin: '[\\$%]\\d+'};
   return {
@@ -2555,7 +3166,7 @@ module.exports = function(hljs) {
     illegal: /\S/
   };
 };
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRING = hljs.inherit(hljs.QUOTE_STRING_MODE, {illegal: ''});
   var PARAMS = {
@@ -2641,7 +3252,7 @@ module.exports = function(hljs) {
     illegal: '//|->|=>|\\[\\['
   };
 };
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 module.exports = function(hljs) {
   var CPP = hljs.getLanguage('cpp').exports;
 	return {
@@ -2741,7 +3352,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = function(hljs) {
     //local labels: %?[FB]?[AT]?\d{1,2}\w+
   return {
@@ -2833,7 +3444,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['adoc'],
@@ -3021,7 +3632,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = function (hljs) {
   var KEYWORDS =
     'false synchronized int abstract float private char boolean static null if const ' +
@@ -3166,7 +3777,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = function(hljs) {
   var BACKTICK_ESCAPE = {
     begin: '`[\\s\\S]'
@@ -3225,7 +3836,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = function(hljs) {
     var KEYWORDS = 'ByRef Case Const ContinueCase ContinueLoop ' +
         'Default Dim Do Else ElseIf EndFunc EndIf EndSelect ' +
@@ -3361,7 +3972,7 @@ module.exports = function(hljs) {
         ]
     }
 };
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -3423,7 +4034,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = function(hljs) {
   var VARIABLE = {
     className: 'variable',
@@ -3476,7 +4087,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: 'false int abstract private char boolean static null if for true ' +
@@ -3507,7 +4118,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = function(hljs) {
   var VAR = {
     className: 'variable',
@@ -3582,7 +4193,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -3633,7 +4244,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = function(hljs){
   return {
     contains: [
@@ -3662,7 +4273,7 @@ module.exports = function(hljs){
     ]
   };
 };
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 module.exports = function(hljs){
   var LITERAL = {
     className: 'literal',
@@ -3699,7 +4310,7 @@ module.exports = function(hljs){
     ]
   };
 };
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS =
     'div mod in and or not xor asserterror begin case do downto else end exit for if of repeat then to ' +
@@ -3779,7 +4390,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['capnp'],
@@ -3828,7 +4439,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports = function(hljs) {
   // 2.3. Identifiers and keywords
   var KEYWORDS =
@@ -3895,7 +4506,7 @@ module.exports = function(hljs) {
     ].concat(EXPRESSIONS)
   };
 };
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['clean','icl','dcl'],
@@ -3920,7 +4531,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -3935,7 +4546,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = function(hljs) {
   var keywords = {
     'builtin-name':
@@ -4031,7 +4642,7 @@ module.exports = function(hljs) {
     contains: [LIST, STRING, HINT, HINT_COL, COMMENT, KEY, COLLECTION, NUMBER, LITERAL]
   }
 };
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['cmake.in'],
@@ -4069,7 +4680,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -4215,7 +4826,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -4282,7 +4893,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 module.exports = function cos (hljs) {
 
   var STRINGS = {
@@ -4406,7 +5017,7 @@ module.exports = function cos (hljs) {
     ]
   };
 };
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 module.exports = function(hljs) {
   var CPP_PRIMITIVE_TYPES = {
     className: 'keyword',
@@ -4581,7 +5192,7 @@ module.exports = function(hljs) {
     }
   };
 };
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 module.exports = function(hljs) {
   var RESOURCES = 'primitive rsc_template';
 
@@ -4675,7 +5286,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUM_SUFFIX = '(_[uif](8|16|32|64))?';
   var CRYSTAL_IDENT_RE = '[a-zA-Z_]\\w*[!?=]?';
@@ -4869,7 +5480,7 @@ module.exports = function(hljs) {
     contains: CRYSTAL_DEFAULT_CONTAINS
   };
 };
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -5046,7 +5657,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: false,
@@ -5068,7 +5679,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z-][a-zA-Z0-9_-]*';
   var RULE = {
@@ -5173,7 +5784,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 module.exports = /**
  * Known issues:
  *
@@ -5431,7 +6042,7 @@ function(hljs) {
     ]
   };
 };
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 module.exports = function (hljs) {
   var SUBST = {
     className: 'subst',
@@ -5532,7 +6143,7 @@ module.exports = function (hljs) {
     ]
   }
 };
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS =
     'exports register file shl array record property for mod while set ally label uses raise not ' +
@@ -5601,7 +6212,7 @@ module.exports = function(hljs) {
     ].concat(COMMENT_MODES)
   };
 };
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['patch'],
@@ -5641,7 +6252,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = function(hljs) {
   var FILTER = {
     begin: /\|[A-Za-z]+:?/,
@@ -5705,7 +6316,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['bind', 'zone'],
@@ -5734,7 +6345,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['docker'],
@@ -5756,7 +6367,7 @@ module.exports = function(hljs) {
     illegal: '</'
   }
 };
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT = hljs.COMMENT(
     /^\s*@?rem\b/, /$/,
@@ -5808,7 +6419,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports = function(hljs) {
   var QUOTED_PROPERTY = {
     className: 'string',
@@ -5855,7 +6466,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRINGS = {
     className: 'string',
@@ -5979,7 +6590,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports = function(hljs) {
   var EXPRESSION_KEYWORDS = 'if eq ne lt lte gt gte select default math sep';
   return {
@@ -6011,7 +6622,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports = function(hljs) {
     var commentMode = hljs.COMMENT(/\(\*/, /\*\)/);
 
@@ -6044,7 +6655,7 @@ module.exports = function(hljs) {
         ]
     };
 };
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports = function(hljs) {
   var ELIXIR_IDENT_RE = '[a-zA-Z_][a-zA-Z0-9_]*(\\!|\\?)?';
   var ELIXIR_METHOD_RE = '[a-zA-Z_]\\w*[!?=]?|[-+~]\\@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?';
@@ -6141,7 +6752,7 @@ module.exports = function(hljs) {
     contains: ELIXIR_DEFAULT_CONTAINS
   };
 };
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT = {
     variants: [
@@ -6225,7 +6836,7 @@ module.exports = function(hljs) {
     illegal: /;/
   };
 };
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     subLanguage: 'xml',
@@ -6240,7 +6851,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -6286,7 +6897,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = function(hljs) {
   var BASIC_ATOM_RE = '[a-z\'][a-zA-Z0-9_\']*';
   var FUNCTION_NAME_RE = '(' + BASIC_ATOM_RE + ':' + BASIC_ATOM_RE + '|' + BASIC_ATOM_RE + ')';
@@ -6432,7 +7043,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['xlsx', 'xls'],
@@ -6480,7 +7091,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -6509,7 +7120,7 @@ module.exports = function(hljs) {
     case_insensitive: true
   };
 };
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 module.exports = function (hljs) {
 
     var CHAR = {
@@ -6554,7 +7165,7 @@ module.exports = function (hljs) {
         ]
     };
 };
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 module.exports = function(hljs) {
   var PARAMS = {
     className: 'params',
@@ -6625,7 +7236,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 module.exports = function(hljs) {
   var TYPEPARAM = {
     begin: '<', end: '>',
@@ -6684,7 +7295,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = function (hljs) {
   var KEYWORDS = {
     'keyword':
@@ -6838,7 +7449,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],68:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword: 'and bool break call callexe checkinterrupt clear clearg closeall cls comlog compile ' +
@@ -7062,7 +7673,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 module.exports = function(hljs) {
     var GCODE_IDENT_RE = '[A-Z_][A-Z0-9_.]*';
     var GCODE_CLOSE_RE = '\\%';
@@ -7129,7 +7740,7 @@ module.exports = function(hljs) {
         ].concat(GCODE_CODE)
     };
 };
-},{}],70:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 module.exports = function (hljs) {
   return {
     aliases: ['feature'],
@@ -7166,7 +7777,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],71:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -7283,7 +7894,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],72:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 module.exports = function(hljs) {
   var GO_KEYWORDS = {
     keyword:
@@ -7337,7 +7948,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],73:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 module.exports = function(hljs) {
     return {
       keywords: {
@@ -7360,7 +7971,7 @@ module.exports = function(hljs) {
       ]
     }
 };
-},{}],74:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -7395,7 +8006,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],75:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 module.exports = function(hljs) {
     return {
         keywords: {
@@ -7489,7 +8100,7 @@ module.exports = function(hljs) {
         illegal: /#|<\//
     }
 };
-},{}],76:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 module.exports = // TODO support filter tags like :javascript, support inline HTML
 function(hljs) {
   return {
@@ -7596,7 +8207,7 @@ function(hljs) {
     ]
   };
 };
-},{}],77:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILT_INS = {'builtin-name': 'each in with if else unless bindattr action collection debugger log outlet template unbound view yield'};
   return {
@@ -7630,7 +8241,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],78:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT = {
     variants: [
@@ -7752,7 +8363,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],79:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z_$][a-zA-Z0-9_$]*';
   var IDENT_FUNC_RETURN_TYPE_RE = '([*]|[a-zA-Z_$][a-zA-Z0-9_$]*)';
@@ -7864,7 +8475,7 @@ module.exports = function(hljs) {
     illegal: /<\//
   };
 };
-},{}],80:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -7910,7 +8521,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],81:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILT_INS = 'action collection component concat debugger each each-in else get hash if input link-to loc log mut outlet partial query-params render textarea unbound unless with yield view';
 
@@ -7981,7 +8592,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],82:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 module.exports = function(hljs) {
   var VERSION = 'HTTP/[0-9\\.]+';
   return {
@@ -8022,7 +8633,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],83:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 module.exports = function(hljs) {
   var keywords = {
     'builtin-name':
@@ -8124,7 +8735,7 @@ module.exports = function(hljs) {
     contains: [SHEBANG, LIST, STRING, HINT, HINT_COL, COMMENT, KEY, COLLECTION, NUMBER, LITERAL]
   }
 };
-},{}],84:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 module.exports = function(hljs) {
   var START_BRACKET = '\\[';
   var END_BRACKET = '\\]';
@@ -8181,7 +8792,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],85:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRING = {
     className: "string",
@@ -8247,7 +8858,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],86:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 module.exports = function(hljs) {
   var PARAMS = {
     className: 'params',
@@ -8323,7 +8934,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],87:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 module.exports = function(hljs) {
   var JAVA_IDENT_RE = '[\u00C0-\u02B8a-zA-Z_$][\u00C0-\u02B8a-zA-Z_$0-9]*';
   var GENERIC_IDENT_RE = JAVA_IDENT_RE + '(<' + JAVA_IDENT_RE + '(\\s*,\\s*' + JAVA_IDENT_RE + ')*>)?';
@@ -8431,7 +9042,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],88:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[A-Za-z$_][0-9A-Za-z$_]*';
   var KEYWORDS = {
@@ -8602,7 +9213,7 @@ module.exports = function(hljs) {
     illegal: /#(?!!)/
   };
 };
-},{}],89:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 module.exports = function (hljs) {
   var PARAM = {
     begin: /[\w-]+ *=/, returnBegin: true,
@@ -8649,7 +9260,7 @@ module.exports = function (hljs) {
     ]
   }
 };
-},{}],90:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 module.exports = function(hljs) {
   var LITERALS = {literal: 'true false null'};
   var TYPES = [
@@ -8686,7 +9297,7 @@ module.exports = function(hljs) {
     illegal: '\\S'
   };
 };
-},{}],91:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -8710,7 +9321,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],92:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 module.exports = function(hljs) {
   // Since there are numerous special names in Julia, it is too much trouble
   // to maintain them by hand. Hence these names (i.e. keywords, literals and
@@ -8872,7 +9483,7 @@ module.exports = function(hljs) {
 
   return DEFAULT;
 };
-},{}],93:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -9046,7 +9657,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],94:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 module.exports = function(hljs) {
   var LASSO_IDENT_RE = '[a-zA-Z_][\\w.]*';
   var LASSO_ANGLE_RE = '<\\?(lasso(script)?|=)';
@@ -9209,7 +9820,7 @@ module.exports = function(hljs) {
     ].concat(LASSO_CODE)
   };
 };
-},{}],95:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -9232,7 +9843,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],96:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 module.exports = function (hljs) {
   return {
     contains: [
@@ -9272,7 +9883,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],97:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE        = '[\\w-]+'; // yes, Less identifiers may begin with a digit
   var INTERP_IDENT_RE = '(' + IDENT_RE + '|@{' + IDENT_RE + '})';
@@ -9412,7 +10023,7 @@ module.exports = function(hljs) {
     contains: RULES
   };
 };
-},{}],98:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 module.exports = function(hljs) {
   var LISP_IDENT_RE = '[a-zA-Z_\\-\\+\\*\\/\\<\\=\\>\\&\\#][a-zA-Z0-9_\\-\\+\\*\\/\\<\\=\\>\\&\\#!]*';
   var MEC_RE = '\\|[^]*?\\|';
@@ -9515,7 +10126,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],99:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 module.exports = function(hljs) {
   var VARIABLE = {
     begin: '\\b[gtps][A-Z]+[A-Za-z0-9_\\-]*\\b|\\$_[A-Z]+',
@@ -9672,7 +10283,7 @@ module.exports = function(hljs) {
     illegal: ';$|^\\[|^=|&|{'
   };
 };
-},{}],100:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -9821,7 +10432,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],101:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 module.exports = function(hljs) {
   var identifier = '([-a-zA-Z$._][\\w\\-$.]*)';
   return {
@@ -9910,7 +10521,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],102:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 module.exports = function(hljs) {
 
     var LSL_STRING_ESCAPE_CHARS = {
@@ -9993,7 +10604,7 @@ module.exports = function(hljs) {
         ]
     };
 };
-},{}],103:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 module.exports = function(hljs) {
   var OPENING_LONG_BRACKET = '\\[=*\\[';
   var CLOSING_LONG_BRACKET = '\\]=*\\]';
@@ -10059,7 +10670,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],104:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 module.exports = function(hljs) {
   /* Variables: simple (eg $(var)) and special (eg $@) */
   var VARIABLE = {
@@ -10140,7 +10751,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],105:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['md', 'mkdown', 'mkd'],
@@ -10248,7 +10859,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],106:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['mma'],
@@ -10306,7 +10917,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],107:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMON_CONTAINS = [
     hljs.C_NUMBER_MODE,
@@ -10394,7 +11005,7 @@ module.exports = function(hljs) {
     ].concat(COMMON_CONTAINS)
   };
 };
-},{}],108:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = 'if then else elseif for thru do while unless step in and or not';
   var LITERALS = 'true false unknown inf minf ind und %e %i %pi %phi %gamma';
@@ -10800,7 +11411,7 @@ module.exports = function(hljs) {
     illegal: /@/
   }
 };
-},{}],109:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords:
@@ -11025,7 +11636,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],110:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -11107,7 +11718,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],111:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 module.exports = function(hljs) {
     //local labels: %?[FB]?[AT]?\d{1,2}\w+
   return {
@@ -11193,7 +11804,7 @@ module.exports = function(hljs) {
     illegal: '\/'
   };
 };
-},{}],112:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords:
@@ -11212,7 +11823,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],113:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     subLanguage: 'xml',
@@ -11237,7 +11848,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],114:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUMBER = {
     className: 'number', relevance: 0,
@@ -11312,7 +11923,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],115:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -11424,7 +12035,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],116:[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -11493,7 +12104,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],117:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 module.exports = function(hljs) {
   var VAR = {
     className: 'variable',
@@ -11586,7 +12197,7 @@ module.exports = function(hljs) {
     illegal: '[^\\s\\}]'
   };
 };
-},{}],118:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['nim'],
@@ -11641,7 +12252,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],119:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 module.exports = function(hljs) {
   var NIX_KEYWORDS = {
     keyword:
@@ -11690,7 +12301,7 @@ module.exports = function(hljs) {
     contains: EXPRESSIONS
   };
 };
-},{}],120:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 module.exports = function(hljs) {
   var CONSTANTS = {
     className: 'variable',
@@ -11796,7 +12407,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],121:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 module.exports = function(hljs) {
   var API_CLASS = {
     className: 'built_in',
@@ -11887,7 +12498,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],122:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 module.exports = function(hljs) {
   /* missing support for heredoc-like string (OCaml 4.0.2+) */
   return {
@@ -11958,7 +12569,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],123:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 module.exports = function(hljs) {
 	var SPECIAL_VARS = {
 		className: 'keyword',
@@ -12015,7 +12626,7 @@ module.exports = function(hljs) {
 		]
 	}
 };
-},{}],124:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 module.exports = function(hljs) {
   var OXYGENE_KEYWORDS = 'abstract add and array as asc aspect assembly async begin break block by case class concat const copy constructor continue '+
     'create default delegate desc distinct div do downto dynamic each else empty end ensure enum equals event except exit extension external false '+
@@ -12085,7 +12696,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],125:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 module.exports = function(hljs) {
   var CURLY_SUBCOMMENT = hljs.COMMENT(
     '{',
@@ -12133,7 +12744,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],126:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 module.exports = function(hljs) {
   var PERL_KEYWORDS = 'getpwent getservent quotemeta msgrcv scalar kill dbmclose undef lc ' +
     'ma syswrite tr send umask sysopen shmwrite vec qx utime local oct semctl localtime ' +
@@ -12290,7 +12901,7 @@ module.exports = function(hljs) {
     contains: PERL_DEFAULT_CONTAINS
   };
 };
-},{}],127:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 module.exports = function(hljs) {
   var MACRO = {
     className: 'variable',
@@ -12342,7 +12953,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],128:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 module.exports = function(hljs) {
   var VARIABLE = {
     begin: '\\$+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*'
@@ -12469,7 +13080,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],129:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -12560,7 +13171,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],130:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 module.exports = function(hljs) {
   var BACKTICK_ESCAPE = {
     begin: '`[\\s\\S]',
@@ -12641,7 +13252,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],131:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -12689,7 +13300,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],132:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -12719,7 +13330,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],133:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var ATOM = {
@@ -12807,7 +13418,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],134:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -12843,7 +13454,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],135:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var PUPPET_KEYWORDS = {
@@ -12958,7 +13569,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],136:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 module.exports = // Base deafult colors in PB IDE: background: #FFFFDF; foreground: #000000;
 
 function(hljs) {
@@ -13016,7 +13627,7 @@ function(hljs) {
     ]
   };
 };
-},{}],137:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -13132,7 +13743,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],138:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 module.exports = function(hljs) {
   var Q_KEYWORDS = {
   keyword:
@@ -13155,7 +13766,7 @@ module.exports = function(hljs) {
      ]
   };
 };
-},{}],139:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
       keyword:
@@ -13324,7 +13935,7 @@ module.exports = function(hljs) {
     illegal: /#/
   };
 };
-},{}],140:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '([a-zA-Z]|\\.[a-zA-Z.])[a-zA-Z0-9._]*';
 
@@ -13394,7 +14005,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],141:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords:
@@ -13421,7 +14032,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],142:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENTIFIER = '[a-zA-Z-_][^\\n{]+\\{';
 
@@ -13488,7 +14099,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],143:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 module.exports = // Colors from RouterOS terminal:
 //   green        - #0E9A00
 //   teal         - #0C9A9A
@@ -13647,7 +14258,7 @@ function(hljs) {
     ]
   };
 };
-},{}],144:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -13683,7 +14294,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],145:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 module.exports = function(hljs) {
   var RUBY_METHOD_RE = '[a-zA-Z_]\\w*[!?=]?|[-+~]\\@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?';
   var RUBY_KEYWORDS = {
@@ -13860,7 +14471,7 @@ module.exports = function(hljs) {
     contains: COMMENT_MODES.concat(IRB_DEFAULT).concat(RUBY_DEFAULT_CONTAINS)
   };
 };
-},{}],146:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -13921,7 +14532,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],147:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUM_SUFFIX = '([ui](8|16|32|64|128|size)|f(32|64))\?';
   var KEYWORDS =
@@ -14029,7 +14640,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],148:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var ANNOTATION = { className: 'meta', begin: '@[A-Za-z]+' };
@@ -14144,7 +14755,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],149:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 module.exports = function(hljs) {
   var SCHEME_IDENT_RE = '[^\\(\\)\\[\\]\\{\\}",\'`;#|\\\\\\s]+';
   var SCHEME_SIMPLE_NUMBER_RE = '(\\-|\\+)?\\d+([./]\\d+)?';
@@ -14288,7 +14899,7 @@ module.exports = function(hljs) {
     contains: [SHEBANG, NUMBER, STRING, QUOTED_IDENT, QUOTED_LIST, LIST].concat(COMMENT_MODES)
   };
 };
-},{}],150:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var COMMON_CONTAINS = [
@@ -14342,7 +14953,7 @@ module.exports = function(hljs) {
     ].concat(COMMON_CONTAINS)
   };
 };
-},{}],151:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z-][a-zA-Z0-9_-]*';
   var VARIABLE = {
@@ -14440,7 +15051,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],152:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['console'],
@@ -14455,7 +15066,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],153:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 module.exports = function(hljs) {
   var smali_instr_low_prio = ['add', 'and', 'cmp', 'cmpg', 'cmpl', 'const', 'div', 'double', 'float', 'goto', 'if', 'int', 'long', 'move', 'mul', 'neg', 'new', 'nop', 'not', 'or', 'rem', 'return', 'shl', 'shr', 'sput', 'sub', 'throw', 'ushr', 'xor'];
   var smali_instr_high_prio = ['aget', 'aput', 'array', 'check', 'execute', 'fill', 'filled', 'goto/16', 'goto/32', 'iget', 'instance', 'invoke', 'iput', 'monitor', 'packed', 'sget', 'sparse'];
@@ -14511,7 +15122,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],154:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 module.exports = function(hljs) {
   var VAR_IDENT_RE = '[a-z][a-zA-Z0-9_]*';
   var CHAR = {
@@ -14561,7 +15172,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],155:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['ml'],
@@ -14627,7 +15238,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],156:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 module.exports = function(hljs) {
   var CPP = hljs.getLanguage('cpp').exports;
 
@@ -14998,7 +15609,7 @@ module.exports = function(hljs) {
     illegal: /#/
   };
 };
-},{}],157:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT_MODE = hljs.COMMENT('--', '$');
   return {
@@ -15158,7 +15769,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],158:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -15241,7 +15852,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],159:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['do', 'ado'],
@@ -15279,7 +15890,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],160:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 module.exports = function(hljs) {
   var STEP21_IDENT_RE = '[A-Z_][A-Z0-9_.]*';
   var STEP21_KEYWORDS = {
@@ -15326,7 +15937,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],161:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var VARIABLE = {
@@ -15780,7 +16391,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],162:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 module.exports = function(hljs) {
   var DETAILS = {
     className: 'string',
@@ -15814,7 +16425,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],163:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 module.exports = function(hljs) {
   var SWIFT_KEYWORDS = {
       keyword: '__COLUMN__ __FILE__ __FUNCTION__ __LINE__ as as! as? associativity ' +
@@ -15931,7 +16542,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],164:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var COMMENT = {
@@ -15975,7 +16586,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],165:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -16011,7 +16622,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],166:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['tk'],
@@ -16072,7 +16683,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],167:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMAND = {
     className: 'tag',
@@ -16134,7 +16745,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],168:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILT_IN_TYPES = 'bool byte i16 i32 i64 double string binary';
   return {
@@ -16169,7 +16780,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],169:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 module.exports = function(hljs) {
   var TPID = {
     className: 'number',
@@ -16253,7 +16864,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],170:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 module.exports = function(hljs) {
   var PARAMS = {
     className: 'params',
@@ -16319,7 +16930,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],171:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -16475,7 +17086,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],172:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -16525,7 +17136,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],173:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['vb'],
@@ -16581,7 +17192,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],174:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     subLanguage: 'xml',
@@ -16593,7 +17204,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],175:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['vbs'],
@@ -16632,7 +17243,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],176:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 module.exports = function(hljs) {
   var SV_KEYWORDS = {
     keyword:
@@ -16731,7 +17342,7 @@ module.exports = function(hljs) {
     ]
   }; // return
 };
-},{}],177:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 module.exports = function(hljs) {
   // Regular expression for VHDL numeric literals.
 
@@ -16792,7 +17403,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],178:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     lexemes: /[!#@\w]+/,
@@ -16898,7 +17509,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],179:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -17034,7 +17645,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],180:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILTIN_MODULES =
     'ObjectLoader Animate MovieCredits Slides Filters Shading Materials LensFlare Mapping VLCAudioVideo ' +
@@ -17107,7 +17718,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],181:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 module.exports = function(hljs) {
   var XML_IDENT_RE = '[A-Za-z0-9\\._:-]+';
   var TAG_INTERNALS = {
@@ -17210,7 +17821,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],182:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = 'for let if while then else return where group by xquery encoding version' +
     'module namespace boundary-space preserve strip default collation base-uri ordering' +
@@ -17281,7 +17892,7 @@ module.exports = function(hljs) {
     contains: CONTAINS
   };
 };
-},{}],183:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 module.exports = function(hljs) {
   var LITERALS = 'true false yes no null';
 
@@ -17369,7 +17980,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],184:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRING = {
     className: 'string',
@@ -17476,7 +18087,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],185:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 
 /*
 	Copyright © 2001 Robert Penner
@@ -17744,7 +18355,7 @@ module.exports = function(hljs) {
 
 }).call(this);
 
-},{}],186:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 // A library of seedable RNGs implemented in Javascript.
 //
 // Usage:
@@ -17806,7 +18417,7 @@ sr.tychei = tychei;
 
 module.exports = sr;
 
-},{"./lib/alea":187,"./lib/tychei":188,"./lib/xor128":189,"./lib/xor4096":190,"./lib/xorshift7":191,"./lib/xorwow":192,"./seedrandom":193}],187:[function(require,module,exports){
+},{"./lib/alea":189,"./lib/tychei":190,"./lib/xor128":191,"./lib/xor4096":192,"./lib/xorshift7":193,"./lib/xorwow":194,"./seedrandom":195}],189:[function(require,module,exports){
 // A port of an algorithm by Johannes Baagøe <baagoe@baagoe.com>, 2010
 // http://baagoe.com/en/RandomMusings/javascript/
 // https://github.com/nquinlan/better-random-numbers-for-javascript-mirror
@@ -17922,7 +18533,7 @@ if (module && module.exports) {
 
 
 
-},{}],188:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 // A Javascript implementaion of the "Tyche-i" prng algorithm by
 // Samuel Neves and Filipe Araujo.
 // See https://eden.dei.uc.pt/~sneves/pubs/2011-snfa2.pdf
@@ -18027,7 +18638,7 @@ if (module && module.exports) {
 
 
 
-},{}],189:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 // A Javascript implementaion of the "xor128" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -18110,7 +18721,7 @@ if (module && module.exports) {
 
 
 
-},{}],190:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 // A Javascript implementaion of Richard Brent's Xorgens xor4096 algorithm.
 //
 // This fast non-cryptographic random number generator is designed for
@@ -18258,7 +18869,7 @@ if (module && module.exports) {
   (typeof define) == 'function' && define   // present with an AMD loader
 );
 
-},{}],191:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 // A Javascript implementaion of the "xorshift7" algorithm by
 // François Panneton and Pierre L'ecuyer:
 // "On the Xorgshift Random Number Generators"
@@ -18357,7 +18968,7 @@ if (module && module.exports) {
 );
 
 
-},{}],192:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 // A Javascript implementaion of the "xorwow" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -18445,7 +19056,7 @@ if (module && module.exports) {
 
 
 
-},{}],193:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 /*
 Copyright 2014 David Bau.
 
@@ -18694,7 +19305,7 @@ if ((typeof module) == 'object' && module.exports) {
   Math    // math: package containing random, pow, and seedrandom
 );
 
-},{"crypto":203}],194:[function(require,module,exports){
+},{"crypto":200}],196:[function(require,module,exports){
 // TinyColor v1.4.1
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -19891,7 +20502,7 @@ else {
 
 })(Math);
 
-},{}],195:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 // yy-counter
 // In-browser counter to watch changeable values like counters or FPS
 // David Figatner
@@ -20009,24 +20620,28 @@ module.exports = class Counter
         this.div.innerHTML = s
     }
 }
-},{}],196:[function(require,module,exports){
-const Color = require('tinycolor2')
-const Counter = require('yy-counter')
+},{}],198:[function(require,module,exports){
+'use strict';
 
-const STYLES = {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Color = require('tinycolor2');
+var Counter = require('yy-counter');
+
+var STYLES = {
     'background': 'rgba(0, 0, 0, 0.5)',
-    'color': 'white',
-}
+    'color': 'white'
+};
 
-const STYLES_FPS = {
+var STYLES_FPS = {
     'padding': '0.1em 0.5em'
-}
+};
 
-const STYLES_METER = {
-}
+var STYLES_METER = {};
 
-module.exports = class FPS
-{
+module.exports = function () {
     /**
      * @param {object} [options]
      * @param {boolean} [options.meter=true] include a meter with the FPS
@@ -20041,207 +20656,198 @@ module.exports = class FPS
      * @param {styles[]} [options.stylesMeter] CSS styles to apply to the FPS meter (in javascript format)
      * @param {string} [options.text=" FPS"] change the text to the right of the FPS
      */
-    constructor(options)
-    {
-        this.options = options || {}
-        this.tolerance = this.options.tolerance || 1
-        this.FPS = this.options.FPS || 60
-        this.meterWidth = this.options.meterWidth || 100
-        this.meterHeight = this.options.meterHeight || 25
-        this.meterLineHeight = this.options.meterLineHeight || 4
-        this.div = document.createElement('div')
-        Counter.findParent(this.options.side || 'bottom-right').appendChild(this.div)
-        this.style(this.div, STYLES, this.options.styles)
-        this.divFPS()
-        this.meter = typeof this.options.meter === 'undefined' || this.options.meter
-        this.lastTime = 0
-        this.frameNumber = 0
-        this.lastUpdate = 0
-        this.lastFPS = '--'
+    function FPS(options) {
+        _classCallCheck(this, FPS);
+
+        this.options = options || {};
+        this.tolerance = this.options.tolerance || 1;
+        this.FPS = this.options.FPS || 60;
+        this.meterWidth = this.options.meterWidth || 100;
+        this.meterHeight = this.options.meterHeight || 25;
+        this.meterLineHeight = this.options.meterLineHeight || 4;
+        this.div = document.createElement('div');
+        Counter.findParent(this.options.side || 'bottom-right').appendChild(this.div);
+        this.style(this.div, STYLES, this.options.styles);
+        this.divFPS();
+        this.meter = typeof this.options.meter === 'undefined' || this.options.meter;
+        this.lastTime = 0;
+        this.frameNumber = 0;
+        this.lastUpdate = 0;
+        this.lastFPS = '--';
     }
 
     /**
      * change desired FPS
      * @type {number}
      */
-    get fps()
-    {
-        return this.FPS
-    }
-    set fps(value)
-    {
-        this.FPS = value
-    }
 
-    /**
-     * remove meter from DOM
-     */
-    remove()
-    {
-        this.div.remove()
-    }
 
-    /**
-     * @type {boolean} meter (the FPS graph) is on or off
-     */
-    get meter()
-    {
-        return this._meter
-    }
-    set meter(value)
-    {
-        if (value)
-        {
-            this.divMeter()
-        }
-        else if (this.meterCanvas)
-        {
-            this.meterCanvas.style.display = 'none'
-        }
-    }
+    _createClass(FPS, [{
+        key: 'remove',
 
-    style(div, style1, style2)
-    {
-        for (let style in style1)
-        {
-            div.style[style] = style1[style]
+
+        /**
+         * remove meter from DOM
+         */
+        value: function remove() {
+            this.div.remove();
         }
-        if (style2)
-        {
-            for (let style in style2)
-            {
-                div.style[style] = style2[style]
+
+        /**
+         * @type {boolean} meter (the FPS graph) is on or off
+         */
+
+    }, {
+        key: 'style',
+        value: function style(div, style1, style2) {
+            for (var style in style1) {
+                div.style[style] = style1[style];
             }
-        }
-    }
-
-    /**
-     * create div for text FPS
-     * @private
-     * @param {HTMLElement} div
-     * @param {object} options (see contructor)
-     */
-    divFPS()
-    {
-        const div = this.div
-        const options = this.options
-        const divFPS = document.createElement('div')
-        div.appendChild(divFPS)
-        this.fpsSpan = document.createElement('span')
-        divFPS.appendChild(this.fpsSpan)
-        const span = document.createElement('span')
-        divFPS.appendChild(span)
-        span.innerText = typeof options.text !== 'undefined' ? options.text : ' FPS'
-        this.style(div, STYLES_FPS, options.stylesFPS)
-    }
-
-    /**
-     * create div for FPS meter
-     * @private
-     * @param {HTMLElement} div
-     * @param {object} options (see contructor)
-     */
-    divMeter()
-    {
-        const div = this.div
-        const options = this.options
-        if (!this.meterCanvas)
-        {
-            this.meterCanvas = document.createElement('canvas')
-            div.appendChild(this.meterCanvas)
-            this.meterCanvas.width = this.meterWidth
-            this.meterCanvas.height = this.meterHeight
-            this.meterCanvas.style.width = div.width + 'px'
-            this.meterCanvas.style.height = div.height + 'px'
-            this.style(this.meterCanvas, STYLES_METER, options.stylesMeter)
-        }
-        else
-        {
-            this.meterCanvas.style.display = 'block'
-        }
-    }
-
-    /**
-     * call this at the start of the frame to calculate FPS
-     */
-    frame()
-    {
-        this.frameNumber++
-        const currentTime = performance.now() - this.lastTime
-
-        // skip large differences to remove garbage
-        if (currentTime > 500)
-        {
-            if (this.lastTime !== 0)
-            {
-                this.lastFPS = Math.floor(this.frameNumber / (currentTime / 1000))
-                if (this.lastFPS >= this.FPS - this.tolerance && this.lastFPS <= this.FPS + this.tolerance)
-                {
-                    this.lastFPS = this.FPS
+            if (style2) {
+                for (var _style in style2) {
+                    div.style[_style] = style2[_style];
                 }
             }
-            this.lastTime = performance.now()
-            this.frameNumber = 0
         }
-        this.fpsSpan.innerText = this.lastFPS
-        if (this.meterCanvas && this.lastFPS !== '--')
-        {
-            this.meterUpdate(this.lastFPS / this.FPS)
-        }
-    }
 
-    meterUpdate(percent)
-    {
-        const c = this.meterCanvas.getContext('2d')
-        const data = c.getImageData(0, 0, this.meterCanvas.width, this.meterCanvas.height)
-        c.putImageData(data, -1, 0)
-        c.clearRect(this.meterCanvas.width - 1, 0, 1, this.meterCanvas.height)
-        if (percent < 0.5)
-        {
-            c.fillStyle = Color.mix('#ff0000', '0xffa500', percent * 200).toHexString()
-        }
-        else
-        {
-            c.fillStyle = Color.mix('#ffa500', '#00ff00', (percent - 0.5) * 200).toHexString()
-        }
-        const height = (this.meterCanvas.height - this.meterLineHeight) * (1 - percent)
-        c.fillRect(this.meterCanvas.width - 1, height, 1, this.meterLineHeight)
-    }
+        /**
+         * create div for text FPS
+         * @private
+         * @param {HTMLElement} div
+         * @param {object} options (see contructor)
+         */
 
-    side(options)
-    {
-        if (options.side)
-        {
-            options.side = options.side.toLowerCase()
-            if (options.side.indexOf('left') !== -1)
-            {
-                STYLES['left'] = 0
-                delete STYLES['right']
-            }
-            else
-            {
-                STYLES['right'] = 0
-                delete STYLES['left']
-            }
-            if (options.side.indexOf('top') !== -1)
-            {
-                STYLES['top'] = 0
-                delete STYLES['bottom']
-            }
-            else
-            {
-                STYLES['bottom'] = 0
-                delete STYLES['top']
+    }, {
+        key: 'divFPS',
+        value: function divFPS() {
+            var div = this.div;
+            var options = this.options;
+            var divFPS = document.createElement('div');
+            div.appendChild(divFPS);
+            this.fpsSpan = document.createElement('span');
+            divFPS.appendChild(this.fpsSpan);
+            var span = document.createElement('span');
+            divFPS.appendChild(span);
+            span.innerText = typeof options.text !== 'undefined' ? options.text : ' FPS';
+            this.style(div, STYLES_FPS, options.stylesFPS);
+        }
+
+        /**
+         * create div for FPS meter
+         * @private
+         * @param {HTMLElement} div
+         * @param {object} options (see contructor)
+         */
+
+    }, {
+        key: 'divMeter',
+        value: function divMeter() {
+            var div = this.div;
+            var options = this.options;
+            if (!this.meterCanvas) {
+                this.meterCanvas = document.createElement('canvas');
+                div.appendChild(this.meterCanvas);
+                this.meterCanvas.width = this.meterWidth;
+                this.meterCanvas.height = this.meterHeight;
+                this.meterCanvas.style.width = div.width + 'px';
+                this.meterCanvas.style.height = div.height + 'px';
+                this.style(this.meterCanvas, STYLES_METER, options.stylesMeter);
+            } else {
+                this.meterCanvas.style.display = 'block';
             }
         }
-        else
-        {
-            STYLES['right'] = 0
-            STYLES['bottom'] = 0
+
+        /**
+         * call this at the start of the frame to calculate FPS
+         */
+
+    }, {
+        key: 'frame',
+        value: function frame() {
+            this.frameNumber++;
+            var currentTime = performance.now() - this.lastTime;
+
+            // skip large differences to remove garbage
+            if (currentTime > 500) {
+                if (this.lastTime !== 0) {
+                    this.lastFPS = Math.floor(this.frameNumber / (currentTime / 1000));
+                    if (this.lastFPS >= this.FPS - this.tolerance && this.lastFPS <= this.FPS + this.tolerance) {
+                        this.lastFPS = this.FPS;
+                    }
+                }
+                this.lastTime = performance.now();
+                this.frameNumber = 0;
+            }
+            this.fpsSpan.innerText = this.lastFPS;
+            if (this.meterCanvas && this.lastFPS !== '--') {
+                this.meterUpdate(this.lastFPS / this.FPS);
+            }
         }
-    }
-}
-},{"tinycolor2":194,"yy-counter":195}],197:[function(require,module,exports){
+    }, {
+        key: 'meterUpdate',
+        value: function meterUpdate(percent) {
+            var c = this.meterCanvas.getContext('2d');
+            var data = c.getImageData(0, 0, this.meterCanvas.width, this.meterCanvas.height);
+            c.putImageData(data, -1, 0);
+            c.clearRect(this.meterCanvas.width - 1, 0, 1, this.meterCanvas.height);
+            if (percent < 0.5) {
+                c.fillStyle = Color.mix('#ff0000', '0xffa500', percent * 200).toHexString();
+            } else {
+                c.fillStyle = Color.mix('#ffa500', '#00ff00', (percent - 0.5) * 200).toHexString();
+            }
+            var height = (this.meterCanvas.height - this.meterLineHeight) * (1 - percent);
+            c.fillRect(this.meterCanvas.width - 1, height, 1, this.meterLineHeight);
+        }
+    }, {
+        key: 'side',
+        value: function side(options) {
+            if (options.side) {
+                options.side = options.side.toLowerCase();
+                if (options.side.indexOf('left') !== -1) {
+                    STYLES['left'] = 0;
+                    delete STYLES['right'];
+                } else {
+                    STYLES['right'] = 0;
+                    delete STYLES['left'];
+                }
+                if (options.side.indexOf('top') !== -1) {
+                    STYLES['top'] = 0;
+                    delete STYLES['bottom'];
+                } else {
+                    STYLES['bottom'] = 0;
+                    delete STYLES['top'];
+                }
+            } else {
+                STYLES['right'] = 0;
+                STYLES['bottom'] = 0;
+            }
+        }
+    }, {
+        key: 'fps',
+        get: function get() {
+            return this.FPS;
+        },
+        set: function set(value) {
+            this.FPS = value;
+        }
+    }, {
+        key: 'meter',
+        get: function get() {
+            return this._meter;
+        },
+        set: function set(value) {
+            if (value) {
+                this.divMeter();
+            } else if (this.meterCanvas) {
+                this.meterCanvas.style.display = 'none';
+            }
+        }
+    }]);
+
+    return FPS;
+}();
+
+},{"tinycolor2":196,"yy-counter":197}],199:[function(require,module,exports){
 // yy-random
 // by David Figatner
 // MIT license
@@ -20667,604 +21273,6 @@ class Random
 }
 
 module.exports = new Random()
-},{"seedrandom":186}],198:[function(require,module,exports){
-module.exports = class Color
-{
-    constructor(style, original, colors, options)
-    {
-        this.style = style
-        if (Array.isArray(colors))
-        {
-            this.colors = colors
-        }
-        else
-        {
-            this.colors = [colors]
-        }
-        colors.push(original)
-        this.interval = options.duration / colors.length
-        this.options = options
-        this.time = 0
-    }
+},{"seedrandom":188}],200:[function(require,module,exports){
 
-    update(element)
-    {
-        const i = Math.floor(this.time / this.interval)
-        const color = this.colors[i]
-        if (element.style[this.style] !== color)
-        {
-            element.style[this.style] = this.colors[i]
-        }
-    }
-
-    reverse()
-    {
-        const reverse = []
-        for (let color in this.colors)
-        {
-            reverse.unshift(this.colors[color])
-        }
-        reverse.push(reverse.shift())
-        this.colors = reverse
-    }
-}
-},{}],199:[function(require,module,exports){
-const EventEmitter = require('eventemitter3')
-const Penner = require('penner')
-const exists = require('exists')
-
-const DomEaseElement = require('./easeElement')
-
-/**
- * Manages all animations running on DOM objects
- * @extends EventEmitter
- * @example
- * var Ease = require('dom-ease');
- * var ease = new Ease({ duration: 3000, ease: 'easeInOutSine' });
- *
- * var test = document.getElementById('test')
- * ease.add(test, { left: 20, top: 15, opacity: 0.25 }, { repeat: true, reverse: true })
- */
-class DomEase extends EventEmitter
-{
-    /**
-     * @param {object} [options]
-     * @param {number} [options.duration=1000] default duration
-     * @param {(string|function)} [options.ease=penner.linear] default ease
-     * @param {(string|function)} [options.autostart=true]
-     * @param {boolean} [options.pauseOnBlur] pause timer on blur, resume on focus
-     * @fires DomEase#complete
-     * @fires DomEase#each
-     */
-    constructor(options)
-    {
-        super()
-        this.options = options || {}
-        this.options.duration = this.options.duration || 1000
-        this.options.ease = this.options.ease || Penner.linear
-        this.list = []
-        this.empty = true
-        if (!options.autostart)
-        {
-            this.start()
-        }
-        if (options.pauseOnBlur)
-        {
-            window.addEventListener('blur', () => this.blur())
-            window.addEventListener('focus', () => this.focus())
-        }
-    }
-
-    /**
-     * start animation loop
-     * alternatively, you can manually call update() on each loop
-     */
-    start()
-    {
-        if (!this._requested)
-        {
-            this._requested = true
-            this.loop()
-            this.running = true
-        }
-    }
-
-    blur()
-    {
-        if (this.running)
-        {
-            this.stop()
-            this.running = true
-        }
-    }
-
-    focus()
-    {
-        if (this.running)
-        {
-            this.start()
-        }
-    }
-
-    loop(time)
-    {
-        if (time)
-        {
-            const elapsed = this._last ? time - this._last : 0
-            this.update(elapsed)
-        }
-        this._last = time
-        this._requestId = window.requestAnimationFrame((time) => this.loop(time))
-    }
-
-    /**
-     * stop animation loop
-     */
-    stop()
-    {
-        if (this._requested)
-        {
-            window.cancelAnimationFrame(this._requestId)
-            this._requested = false
-            this.running = false
-        }
-    }
-
-    /**
-     * add animation(s) to a DOM element
-     * @param {(HTMLElement|HTMLElement[])} element
-     * @param {object} params
-     * @param {number} [params.left] uses px
-     * @param {number} [params.top] uses px
-     * @param {number} [params.width] uses px
-     * @param {number} [params.height] uses px
-     * @param {number} [params.scale]
-     * @param {number} [params.scaleX]
-     * @param {number} [params.scaleY]
-     * @param {number} [params.opacity]
-     * @param {(color|color[])} [params.color]
-     * @param {(color|color[])} [params.backgroundColor]
-     * @param {object} [options]
-     * @param {number} [options.duration]
-     * @param {(string|function)} [options.ease]
-     * @param {(boolean|number)} [options.repeat]
-     * @param {boolean} [options.reverse]
-     * @returns {DomEaseElement}
-     */
-    add(element, params, options)
-    {
-        // call add on all elements if array
-        if (Array.isArray(element))
-        {
-            for (let i = 0; i < element.length; i++)
-            {
-                if (i === element.length - 1)
-                {
-                    return this.add(element[i], params, options)
-                }
-                else
-                {
-                    this.add(element[i], params, options)
-                }
-            }
-        }
-
-        // set up default options
-        options = options || {}
-        options.duration = exists(options.duration) ? options.duration : this.options.duration
-        options.ease = options.ease || this.options.ease
-        if (typeof options.ease === 'string')
-        {
-            options.ease = Penner[options.ease]
-        }
-
-        if (element.__domEase)
-        {
-            element.__domEase.add(params, options)
-        }
-        else
-        {
-            const domEase = element.__domEase = new DomEaseElement(element)
-            domEase.add(params, options)
-            this.list.push(domEase)
-        }
-        return element.__domEase
-    }
-
-    /**
-     * remove animation(s)
-     * @param {(Animation|HTMLElement)} object
-     */
-    remove(object)
-    {
-        const element = object.__domEase ? object.__domEase.element : object
-        const index = this.list.indexOf(element)
-        if (index !== -1)
-        {
-            this.list.splice(index, 1)
-        }
-        delete element.__domEase
-    }
-
-    /**
-     * remove all animations from list
-     */
-    removeAll()
-    {
-        while (this.list.length)
-        {
-            const DomEaseElement = this.list.pop()
-            if (DomEaseElement.element.__domEase)
-            {
-                delete DomEaseElement.element.__domEase
-            }
-        }
-    }
-
-    /**
-     * update frame; this is called automatically if start() is used
-     * @param {number} elapsed time in ms
-     */
-    update(elapsed)
-    {
-        for (let i = 0, _i = this.list.length; i < _i; i++)
-        {
-            if (this.list[i].update(elapsed))
-            {
-                this.list.splice(i, 1)
-                i--
-                _i--
-            }
-        }
-        this.emit('each', this)
-        if (!this.empty && Array.keys(this.list).length === 0 && !this.empty)
-        {
-            this.emit('done', this)
-            this.empty = true
-        }
-    }
-
-    /**
-     * number of elements being DomEaseElementd
-     * @returns {number}
-     */
-    countElements()
-    {
-        return this.list.length
-    }
-
-    /**
-     * number of active animations across all elements
-     * @returns {number}
-     */
-    countRunning()
-    {
-        let count = 0
-        for (let entry of this.list)
-        {
-            count += Object.keys(entry).length - 1
-        }
-        return count
-    }
-}
-
-/**
- * fires when there are no more animations for a DOM element
- * @event DomEase#complete
- * @type {DomEase}
- */
-
-/**
- * fires on each loop for a DOM element where there are animations
- * @event DomEase#each
- * @type {DomEase}
- */
-
-module.exports = DomEase
-},{"./easeElement":200,"eventemitter3":4,"exists":5,"penner":185}],200:[function(require,module,exports){
-const EventEmitter = require('eventemitter3')
-const exists = require('exists')
-
-const Color = require('./color')
-const Transform = require('./transform')
-const Number = require('./number')
-
-class DomEaseElement extends EventEmitter
-{
-    /**
-     * each DOM element has its own DomEaseElement object returned by add() or accessed through HTMLElement.__domEase
-     * @extends EventEmitter
-     * @fires DomEaseElement#each-*
-     * @fires DomEaseElement#complete-*
-     * @fires DomEaseElement#loop-* - called when animation repeats or reverses
-     */
-    constructor(element)
-    {
-        super()
-
-        /**
-         * element being animated
-         * @member {HTMLElement}
-         */
-        this.element = element
-        this.eases = {}
-    }
-
-    add(params, options)
-    {
-        const element = this.element
-        for (let entry in params)
-        {
-            switch (entry)
-            {
-                case 'left':
-                    this.eases['left'] = new Number(entry, element.offsetLeft, params[entry], options, 'px')
-                    break
-
-                case 'top':
-                    this.eases['top'] = new Number(entry, element.offsetTop, params[entry], options, 'px')
-                    break
-
-                case 'color':
-                    this.eases[entry] = new Color('color', element.style.color, params[entry], options)
-                    break
-
-                case 'backgroundColor':
-                    this.eases[entry] = new Color('backgroundColor', element.style.backgroundColor, params[entry], options)
-                    break
-
-                case 'scale':
-                    this.eases[entry] = new Transform(this, entry, params[entry], options)
-                    break
-
-                case 'scaleX':
-                    this.eases[entry] = new Transform(this, entry, params[entry], options)
-                    break
-
-                case 'scaleY':
-                    this.eases[entry] = new Transform(this, entry, params[entry], options)
-                    break
-
-                case 'opacity':
-                    this.eases[entry] = new Number(entry, exists(element.opacity) ? parseFloat(element.opacity) : 1, params[entry], options)
-                    break
-
-                case 'width':
-                    this.eases[entry] = new Number(entry, element.offsetWidth, params[entry], options, 'px')
-                    break
-
-                case 'height':
-                    this.eases[entry] = new Number(entry, element.offsetHeight, params[entry], options, 'px')
-                    break
-
-                default:
-                    console.warn(entry + ' not setup for animation in DomEase.')
-            }
-        }
-    }
-
-    update(elapsed)
-    {
-        this.transforms = this.readTransform()
-        const element = this.element
-        const eases = this.eases
-        for (let key in eases)
-        {
-            const ease = eases[key]
-            ease.time += elapsed
-            let leftover = null
-            if (ease.time >= ease.options.duration)
-            {
-                leftover = ease.time - ease.options.duration
-                ease.time -= leftover
-            }
-            ease.update(element)
-            if (leftover !== null)
-            {
-                const options = ease.options
-                if (options.reverse)
-                {
-                    this.emit('loop-' + key, ease.element)
-                    ease.reverse()
-                    ease.time = leftover
-                    if (!options.repeat)
-                    {
-                        options.reverse = false
-                    }
-                    else if (options.repeat !== true)
-                    {
-                        options.repeat--
-                    }
-                }
-                else if (options.repeat)
-                {
-                    this.emit('loop-' + key, ease.element)
-                    ease.time = leftover
-                    if (options.repeat !== true)
-                    {
-                        options.repeat--
-                    }
-                }
-                else
-                {
-                    this.emit('complete-' + key, ease.element)
-                    delete eases[key]
-                }
-            }
-            this.emit('each-' + key, ease.element)
-        }
-        this.writeTransform()
-        this.emit('each', this)
-        if (Object.keys(eases).length === 0)
-        {
-            this.emit('empty', this)
-            return true
-        }
-    }
-
-    readTransform()
-    {
-        const transforms = []
-        const transform = this.element.style.transform
-        let inside, name = '', values
-        for (let i = 0, _i = transform.length; i < _i; i++)
-        {
-            const letter = transform[i]
-            if (inside)
-            {
-                if (letter === ')')
-                {
-                    inside = false
-                    transforms.push({ name, values })
-                    name = ''
-                }
-                else
-                {
-                    values += letter
-                }
-            }
-            else
-            {
-                if (letter === '(')
-                {
-                    values = ''
-                    inside = true
-                }
-                else if (letter !== ' ')
-                {
-                    name += letter
-                }
-            }
-        }
-        return transforms
-    }
-
-    changeTransform(name, values)
-    {
-        const transforms = this.transforms
-        for (let i = 0, _i = transforms.length; i < _i; i++)
-        {
-            if (transforms[i].name === name)
-            {
-                transforms[i].values = values
-                return
-            }
-        }
-        this.transforms.push({name, values})
-    }
-
-    writeTransform()
-    {
-        const transforms = this.transforms
-        let s = ''
-        for (let i = 0, _i = transforms.length; i < _i; i++)
-        {
-            const transform = transforms[i]
-            s += transform.name + '(' + transform.values + ')'
-        }
-        this.element.style.transform = s
-    }
-}
-
-/**
- * fires when there are no more animations
- * where name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
- * @event DomEaseElement#complete-*
- * @type {DomEaseElement}
- */
-
-/**
- * fires on each loop where there are animations
- * where name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
- * @event DomEaseElement#each-*
- * @type {DomEaseElement}
- */
-
-/**
- * fires when an animation repeats or reverses
- * where name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
- * @event DomEaseElement#loop-*
- * @type {DomEaseElement}
- */
-
-module.exports = DomEaseElement
-},{"./color":198,"./number":201,"./transform":202,"eventemitter3":4,"exists":5}],201:[function(require,module,exports){
-module.exports = class Number
-{
-    constructor(entry, start, to, options, units)
-    {
-        this.entry = entry
-        this.to = to
-        this.options = options
-        this.start = start
-        this.delta = to - start
-        this.units = units || ''
-        this.time = 0
-    }
-
-    update(element)
-    {
-        element.style[this.entry] = this.options.ease(this.time, this.start, this.delta, this.options.duration) + this.units
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],202:[function(require,module,exports){
-module.exports = class Transform
-{
-    constructor(easeElement, entry, to, options)
-    {
-        this.easeElement = easeElement
-        this.entry = entry
-        this.to = to
-        this.options = options
-        this.start = this.calculateStart()
-        this.delta = to - this.start
-        this.time = 0
-    }
-
-    calculateStart()
-    {
-        const transforms = this.easeElement.readTransform()
-        for (let i = 0, _i = transforms.length; i < _i; i++)
-        {
-            const transform = transforms[i]
-            if (transform.name === this.entry)
-            {
-                switch (this.entry)
-                {
-                    case 'scale': case 'scaleX': case 'scaleY':
-                        return parseFloat(transform.values)
-                }
-            }
-        }
-        switch (this.entry)
-        {
-            case 'scale': case 'scaleX': case 'scaleY':
-                return 1
-        }
-
-    }
-
-    update()
-    {
-        this.easeElement.changeTransform(this.entry, this.options.ease(this.time, this.start, this.delta, this.options.duration))
-    }
-
-    reverse()
-    {
-        const swap = this.to
-        this.to = this.start
-        this.start = swap
-        this.delta = -this.delta
-    }
-}
-},{}],203:[function(require,module,exports){
-
-},{}]},{},[1]);
+},{}]},{},[3]);

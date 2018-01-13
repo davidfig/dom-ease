@@ -65,13 +65,11 @@
             
                 <li class="parent  " data-name="DomEase#add"><a href="DomEase.html#add">add</a></li>
             
-                <li class="parent  " data-name="DomEase#countElements"><a href="DomEase.html#countElements">countElements</a></li>
-            
-                <li class="parent  " data-name="DomEase#countRunning"><a href="DomEase.html#countRunning">countRunning</a></li>
-            
                 <li class="  " data-name="DomEase#emit~"><a href="DomEase.html#emit">emit</a></li>
             
                 <li class="  " data-name="DomEase#eventNames~"><a href="DomEase.html#eventNames">eventNames</a></li>
+            
+                <li class="parent  " data-name="DomEase#getCount"><a href="DomEase.html#getCount">getCount</a></li>
             
                 <li class="  " data-name="DomEase#listenerCount~"><a href="DomEase.html#listenerCount">listenerCount</a></li>
             
@@ -88,6 +86,8 @@
                 <li class="  " data-name="DomEase#removeAllListeners~"><a href="DomEase.html#removeAllListeners">removeAllListeners</a></li>
             
                 <li class="  " data-name="DomEase#removeListener~"><a href="DomEase.html#removeListener">removeListener</a></li>
+            
+                <li class="parent  " data-name="DomEase#removeObjectEases"><a href="DomEase.html#removeObjectEases">removeObjectEases</a></li>
             
                 <li class="parent  " data-name="DomEase#start"><a href="DomEase.html#start">start</a></li>
             
@@ -108,16 +108,12 @@
         </li>
     
         
-        <li class="item" data-name="DomEaseElement">
+        <li class="item" data-name="Ease">
             <span class="title  ">
                 
-                <a href="DomEaseElement.html">DomEaseElement</a>
+                <a href="Ease.html">Ease</a>
             </span>
             <ul class="members itemMembers">
-            
-            <span class="subtitle">Members</span>
-            
-                <li class="parent " data-name="DomEaseElement#element"><a href="DomEaseElement.html#element">element</a></li>
             
             </ul>
             <ul class="typedefs itemMembers">
@@ -130,32 +126,32 @@
             
             <span class="subtitle">Methods</span>
             
-                <li class="  " data-name="DomEaseElement#emit~"><a href="DomEaseElement.html#emit">emit</a></li>
+                <li class="  " data-name="Ease#emit~"><a href="Ease.html#emit">emit</a></li>
             
-                <li class="  " data-name="DomEaseElement#eventNames~"><a href="DomEaseElement.html#eventNames">eventNames</a></li>
+                <li class="  " data-name="Ease#eventNames~"><a href="Ease.html#eventNames">eventNames</a></li>
             
-                <li class="  " data-name="DomEaseElement#listenerCount~"><a href="DomEaseElement.html#listenerCount">listenerCount</a></li>
+                <li class="  " data-name="Ease#listenerCount~"><a href="Ease.html#listenerCount">listenerCount</a></li>
             
-                <li class="  " data-name="DomEaseElement#listeners~"><a href="DomEaseElement.html#listeners">listeners</a></li>
+                <li class="  " data-name="Ease#listeners~"><a href="Ease.html#listeners">listeners</a></li>
             
-                <li class="  " data-name="DomEaseElement#once~"><a href="DomEaseElement.html#once">once</a></li>
+                <li class="  " data-name="Ease#once~"><a href="Ease.html#once">once</a></li>
             
-                <li class="  " data-name="DomEaseElement#on~"><a href="DomEaseElement.html#on">on</a></li>
+                <li class="  " data-name="Ease#on~"><a href="Ease.html#on">on</a></li>
             
-                <li class="  " data-name="DomEaseElement#removeAllListeners~"><a href="DomEaseElement.html#removeAllListeners">removeAllListeners</a></li>
+                <li class="  " data-name="Ease#removeAllListeners~"><a href="Ease.html#removeAllListeners">removeAllListeners</a></li>
             
-                <li class="  " data-name="DomEaseElement#removeListener~"><a href="DomEaseElement.html#removeListener">removeListener</a></li>
+                <li class="  " data-name="Ease#removeListener~"><a href="Ease.html#removeListener">removeListener</a></li>
             
             </ul>
             <ul class="events itemMembers">
             
             <span class="subtitle">Events</span>
             
-                <li class="parent" data-name="DomEaseElement#event:complete-*"><a href="DomEaseElement.html#event:complete-*">complete-*</a></li>
+                <li class="parent" data-name="Ease#event:complete"><a href="Ease.html#event:complete">complete</a></li>
             
-                <li class="parent" data-name="DomEaseElement#event:each-*"><a href="DomEaseElement.html#event:each-*">each-*</a></li>
+                <li class="parent" data-name="Ease#event:each"><a href="Ease.html#event:each">each</a></li>
             
-                <li class="parent" data-name="DomEaseElement#event:loop-*"><a href="DomEaseElement.html#event:loop-*">loop-*</a></li>
+                <li class="parent" data-name="Ease#event:loop"><a href="Ease.html#event:loop">loop</a></li>
             
             </ul>
         </li>
@@ -179,7 +175,7 @@
         <h2>DomEase
         </h2>
         
-            <div class="class-description">Manages all animations running on DOM objects</div>
+            <div class="class-description">Manages all eases</div>
         
     </div>
 </header>
@@ -206,7 +202,7 @@
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line17">ease.js:17</a>
+            <a href="src_domEase.js.html#line17">domEase.js:17</a>
         </div>
         
     </div>
@@ -525,7 +521,7 @@
             <span class="">
                 add
             </span>
-            <span class="signature">(element, params, <span class="optional">options</span>)</span><span class="type-signature"><a href="DomEaseElement.html">DomEaseElement</a></span>
+            <span class="signature">(element, params, <span class="optional">options</span>)</span><span class="type-signature"><a href="Ease.html">Ease</a></span>
             
             
             
@@ -534,7 +530,7 @@
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line123">ease.js:123</a>
+            <a href="src_domEase.js.html#line122">domEase.js:122</a>
         </div>
         
     </div>
@@ -545,7 +541,7 @@
 
     
     <div class="description">
-        add animation(s) to a DOM element
+        add eases
     </div>
     
 
@@ -583,9 +579,6 @@
             
                 
 <span class="param-type">HTMLElement</span>
-|
-
-<span class="param-type">Array.&lt;HTMLElement></span>
 
 
             
@@ -674,7 +667,7 @@
                         
                     
                 
-                uses px</td>
+                in px</td>
         </tr>
 	
 	
@@ -704,7 +697,7 @@
                         
                     
                 
-                uses px</td>
+                in px</td>
         </tr>
 	
 	
@@ -734,7 +727,7 @@
                         
                     
                 
-                uses px</td>
+                in px</td>
         </tr>
 	
 	
@@ -764,7 +757,7 @@
                         
                     
                 
-                uses px</td>
+                in px</td>
         </tr>
 	
 	
@@ -1193,217 +1186,7 @@
             
             <td class="type">
             
-                        <a href="DomEaseElement.html">DomEaseElement</a>
-                        
-                    
-            </td>
-            <td class="description last"></td>
-        </tr>
-    
-    </tbody>
-</table>
-
-    
-
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="countElements">
-            <a class="share-icon" href="#countElements"><span class="glyphicon glyphicon-link"></span></a>
-            <span class="">
-                countElements
-            </span>
-            <span class="signature">()</span><span class="type-signature">number</span>
-            
-            
-            
-            
-        </h4>
-
-        
-        <div class="tag-source">
-            <a href="src_ease.js.html#line220">ease.js:220</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        number of elements being DomEaseElementd
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Type</th>
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-    <tbody>
-    
-        <tr>
-            
-            <td class="type">
-            
-                        number
-                        
-                    
-            </td>
-            <td class="description last"></td>
-        </tr>
-    
-    </tbody>
-</table>
-
-    
-
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="countRunning">
-            <a class="share-icon" href="#countRunning"><span class="glyphicon glyphicon-link"></span></a>
-            <span class="">
-                countRunning
-            </span>
-            <span class="signature">()</span><span class="type-signature">number</span>
-            
-            
-            
-            
-        </h4>
-
-        
-        <div class="tag-source">
-            <a href="src_ease.js.html#line229">ease.js:229</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        number of active animations across all elements
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Type</th>
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-    <tbody>
-    
-        <tr>
-            
-            <td class="type">
-            
-                        number
+                        <a href="Ease.html">Ease</a>
                         
                     
             </td>
@@ -1667,6 +1450,111 @@ listeners.
             <td class="type">
             
                         Array
+                        
+                    
+            </td>
+            <td class="description last"></td>
+        </tr>
+    
+    </tbody>
+</table>
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="getCount">
+            <a class="share-icon" href="#getCount"><span class="glyphicon glyphicon-link"></span></a>
+            <span class="">
+                getCount
+            </span>
+            <span class="signature">()</span><span class="type-signature">number</span>
+            
+            
+            
+            
+        </h4>
+
+        
+        <div class="tag-source">
+            <a href="src_domEase.js.html#line206">domEase.js:206</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        number of eases
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Type</th>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            
+            <td class="type">
+            
+                        number
                         
                     
             </td>
@@ -2468,7 +2356,7 @@ listeners.
             <span class="">
                 remove
             </span>
-            <span class="signature">(object)</span>
+            <span class="signature">(ease)</span>
             
             
             
@@ -2477,7 +2365,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line167">ease.js:167</a>
+            <a href="src_domEase.js.html#line158">domEase.js:158</a>
         </div>
         
     </div>
@@ -2488,7 +2376,7 @@ listeners.
 
     
     <div class="description">
-        remove animation(s)
+        remove eases using Ease object returned by add()
     </div>
     
 
@@ -2519,16 +2407,13 @@ listeners.
 	
         <tr>
             
-                <td class="name"><code>object</code></td>
+                <td class="name"><code>ease</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Animation</span>
-|
-
-<span class="param-type">HTMLElement</span>
+<span class="param-type"><a href="Ease.html">Ease</a></span>
 
 
             
@@ -2601,7 +2486,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line181">ease.js:181</a>
+            <a href="src_domEase.js.html#line174">domEase.js:174</a>
         </div>
         
     </div>
@@ -2612,7 +2497,7 @@ listeners.
 
     
     <div class="description">
-        remove all animations from list
+        remove all eases
     </div>
     
 
@@ -3049,6 +2934,127 @@ listeners.
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="removeObjectEases">
+            <a class="share-icon" href="#removeObjectEases"><span class="glyphicon glyphicon-link"></span></a>
+            <span class="">
+                removeObjectEases
+            </span>
+            <span class="signature">(element)</span>
+            
+            
+            
+            
+        </h4>
+
+        
+        <div class="tag-source">
+            <a href="src_domEase.js.html#line139">domEase.js:139</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        remove all eases on element
+    </div>
+    
+
+    
+
+    
+
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="start">
             <a class="share-icon" href="#start"><span class="glyphicon glyphicon-link"></span></a>
             <span class="">
@@ -3063,7 +3069,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line51">ease.js:51</a>
+            <a href="src_domEase.js.html#line50">domEase.js:50</a>
         </div>
         
     </div>
@@ -3074,7 +3080,7 @@ listeners.
 
     
     <div class="description">
-        start animation loopalternatively, you can manually call update() on each loop
+        start animation loop (automatically called unless options.autostart=false)
     </div>
     
 
@@ -3139,7 +3145,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line92">ease.js:92</a>
+            <a href="src_domEase.js.html#line91">domEase.js:91</a>
         </div>
         
     </div>
@@ -3215,7 +3221,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line197">ease.js:197</a>
+            <a href="src_domEase.js.html#line183">domEase.js:183</a>
         </div>
         
     </div>
@@ -3346,7 +3352,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line240">ease.js:240</a>
+            <a href="src_domEase.js.html#line212">domEase.js:212</a>
         </div>
         
     </div>
@@ -3432,7 +3438,7 @@ listeners.
 
         
         <div class="tag-source">
-            <a href="src_ease.js.html#line246">ease.js:246</a>
+            <a href="src_domEase.js.html#line218">domEase.js:218</a>
         </div>
         
     </div>
@@ -3514,7 +3520,7 @@ listeners.
 
         <footer class="content-size">
             <div class="footer">
-                Documentation generated by <a target="_blank" href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jan 13 2018 15:47:40 GMT+0800 (DST)
+                Documentation generated by <a target="_blank" href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jan 13 2018 22:14:08 GMT+0800 (DST)
             </div>
         </footer>
     </div>
