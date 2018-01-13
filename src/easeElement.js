@@ -81,6 +81,7 @@ class DomEaseElement extends EventEmitter
 
     update(elapsed)
     {
+        this.changedTransform = false
         this.transforms = this.readTransform()
         const element = this.element
         const eases = this.eases
@@ -129,9 +130,12 @@ class DomEaseElement extends EventEmitter
             }
             this.emit('each-' + key, ease.element)
         }
-        this.writeTransform()
+        if (this.changedTransform)
+        {
+            this.writeTransform()
+        }
         this.emit('each', this)
-        if (Object.keys(eases) === 0)
+        if (Object.keys(eases).length === 0)
         {
             this.emit('empty', this)
             return true
@@ -177,6 +181,7 @@ class DomEaseElement extends EventEmitter
 
     changeTransform(name, values)
     {
+        this.changedTransform = true
         const transforms = this.transforms
         for (let i = 0, _i = transforms.length; i < _i; i++)
         {
@@ -204,21 +209,21 @@ class DomEaseElement extends EventEmitter
 
 /**
  * fires when there are no more animations
- * where name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
+ * where name is the name of the element being eased (e.g., complete-left fires when left finishes animating)
  * @event DomEaseElement#complete-*
  * @type {DomEaseElement}
  */
 
 /**
  * fires on each loop where there are animations
- * where name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
+ * where name is the name of the element being eased (e.g., complete-left fires when left finishes animating)
  * @event DomEaseElement#each-*
  * @type {DomEaseElement}
  */
 
 /**
  * fires when an animation repeats or reverses
- * where name is the name of the element being DomEaseElementd (e.g., complete-left fires when left finishes animating)
+ * where name is the name of the element being eased (e.g., complete-left fires when left finishes animating)
  * @event DomEaseElement#loop-*
  * @type {DomEaseElement}
  */

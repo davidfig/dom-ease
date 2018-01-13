@@ -231,7 +231,7 @@ class DomEase extends EventEmitter
         let count = 0
         for (let entry of this.list)
         {
-            count += Object.keys(entry) - 1
+            count += Object.keys(entry).length - 1
         }
         return count
     }
