@@ -1,112 +1,17 @@
 const EventEmitter = require('eventemitter3')
-const Penner = require('penner')
 const exists = require('exists')
 
-const DomEaseElement = require('./easeElement')
-
-/**
- * Manages all animations running on DOM objects
- * @extends EventEmitter
- * @example
- * var Ease = require('dom-ease');
- * var ease = new Ease({ duration: 3000, ease: 'easeInOutSine' });
- *
- * var test = document.getElementById('test')
- * ease.add(test, { left: 20, top: 15, opacity: 0.25 }, { repeat: true, reverse: true })
- */
-class DomEase extends EventEmitter
+class Ease extends EventEmitter
 {
     /**
-     * @param {object} [options]
-     * @param {number} [options.duration=1000] default duration
-     * @param {(string|function)} [options.ease=penner.linear] default ease
-     * @param {(string|function)} [options.autostart=true]
-     * @param {boolean} [options.pauseOnBlur] pause timer on blur, resume on focus
-     * @fires DomEase#complete
-     * @fires DomEase#each
-     */
-    constructor(options)
-    {
-        super()
-        this.options = options || {}
-        this.options.duration = this.options.duration || 1000
-        this.options.ease = this.options.ease || Penner.linear
-        this.list = []
-        this.empty = true
-        if (!options.autostart)
-        {
-            this.start()
-        }
-        if (options.pauseOnBlur)
-        {
-            window.addEventListener('blur', () => this.blur())
-            window.addEventListener('focus', () => this.focus())
-        }
-    }
-
-    /**
-     * start animation loop
-     * alternatively, you can manually call update() on each loop
-     */
-    start()
-    {
-        if (!this._requested)
-        {
-            this._requested = true
-            this.loop()
-            this.running = true
-        }
-    }
-
-    blur()
-    {
-        if (this.running)
-        {
-            this.stop()
-            this.running = true
-        }
-    }
-
-    focus()
-    {
-        if (this.running)
-        {
-            this.start()
-        }
-    }
-
-    loop(time)
-    {
-        if (time)
-        {
-            const elapsed = this._last ? time - this._last : 0
-            this.update(elapsed)
-        }
-        this._last = time
-        this._requestId = window.requestAnimationFrame((time) => this.loop(time))
-    }
-
-    /**
-     * stop animation loop
-     */
-    stop()
-    {
-        if (this._requested)
-        {
-            window.cancelAnimationFrame(this._requestId)
-            this._requested = false
-            this.running = false
-        }
-    }
-
-    /**
-     * add animation(s) to a DOM element
-     * @param {(HTMLElement|HTMLElement[])} element
+     * Ease class returned by DomEase.add()
+     * @extends EventEmitter
+     * @param {HTMLElement} element
      * @param {object} params
-     * @param {number} [params.left] uses px
-     * @param {number} [params.top] uses px
-     * @param {number} [params.width] uses px
-     * @param {number} [params.height] uses px
+     * @param {number} [params.left] in px
+     * @param {number} [params.top] in px
+     * @param {number} [params.width] in px
+     * @param {number} [params.height] in px
      * @param {number} [params.scale]
      * @param {number} [params.scaleX]
      * @param {number} [params.scaleY]
@@ -118,135 +23,354 @@ class DomEase extends EventEmitter
      * @param {(string|function)} [options.ease]
      * @param {(boolean|number)} [options.repeat]
      * @param {boolean} [options.reverse]
-     * @returns {DomEaseElement}
+     * @returns {Ease}
+     * @fires Ease#each
+     * @fires Ease#complete
+     * @fires Ease#loop
+     * @hideconstructor
      */
-    add(element, params, options)
+    constructor(element, params, options)
     {
-        // call add on all elements if array
-        if (Array.isArray(element))
+        super()
+        this.element = element
+        this.list = []
+        this.time = 0
+        this.duration = options.duration
+        this.ease = options.ease
+        this.repeat = options.repeat
+        this.reverse = options.reverse
+        for (let entry in params)
         {
-            for (let i = 0; i < element.length; i++)
+            switch (entry)
             {
-                if (i === element.length - 1)
-                {
-                    return this.add(element[i], params, options)
-                }
-                else
-                {
-                    this.add(element[i], params, options)
-                }
+                case 'left':
+                    this.numberStart(entry, element.offsetLeft, params[entry], 'px')
+                    break
+
+                case 'top':
+                    this.numberStart(entry, element.offsetTop, params[entry], 'px')
+                    break
+
+                case 'color':
+                    this.colorStart('color', element.style.color, params[entry])
+                    break
+
+                case 'backgroundColor':
+                    this.colorStart('backgroundColor', element.style.backgroundColor, params[entry])
+                    break
+
+                case 'scale':
+                    this.transformStart(entry, params[entry])
+                    break
+
+                case 'scaleX':
+                    this.transformStart(entry, params[entry])
+                    break
+
+                case 'scaleY':
+                    this.transformStart(entry, params[entry])
+                    break
+
+                case 'opacity':
+                    this.numberStart(entry, exists(element.opacity) ? parseFloat(element.opacity) : 1, params[entry])
+                    break
+
+                case 'width':
+                    this.numberStart(entry, element.offsetWidth, params[entry], 'px')
+                    break
+
+                case 'height':
+                    this.numberStart(entry, element.offsetHeight, params[entry], 'px')
+                    break
+
+                default:
+                    console.warn(entry + ' not setup for animation in dom-ease.')
             }
         }
+    }
 
-        // set up default options
-        options = options || {}
-        options.duration = exists(options.duration) ? options.duration : this.options.duration
-        options.ease = options.ease || this.options.ease
-        if (typeof options.ease === 'string')
+    /**
+     * create number entry
+     * @private
+     * @param {string} entry
+     * @param {number} start
+     * @param {number} to
+     * @param {string} [units]
+     */
+    numberStart(entry, start, to, units)
+    {
+        const ease = { type: 'number', entry, to, start, delta: to - start, units: units || '' }
+        this.list.push(ease)
+    }
+
+    numberUpdate(ease, percent)
+    {
+        this.element.style[ease.entry] = (ease.start + ease.delta * percent) + ease.units
+    }
+
+    /**
+     * reverse number and transform
+     * @private
+     * @param {object} ease
+     */
+    easeReverse(ease)
+    {
+        const swap = ease.to
+        ease.to = ease.start
+        ease.start = swap
+        ease.delta = -ease.delta
+    }
+
+    transformStart(entry, to)
+    {
+        const ease = { type: 'transform', entry, to }
+        if (!this.transforms)
         {
-            options.ease = Penner[options.ease]
+            this.readTransform()
         }
-
-        if (element.__domEase)
+        const transforms = this.transforms
+        let found
+        for (let i = 0, _i = transforms.length; i < _i; i++)
         {
-            element.__domEase.add(params, options)
+            const transform = transforms[i]
+            if (transform.name === entry)
+            {
+                switch (entry)
+                {
+                    case 'scale': case 'scaleX': case 'scaleY':
+                        ease.start = parseFloat(transform.values)
+                        break
+                }
+                found = true
+                break
+            }
+        }
+        if (!found)
+        {
+            switch (entry)
+            {
+                case 'scale': case 'scaleX': case 'scaleY':
+                    ease.start = 1
+            }
+        }
+        ease.delta = to - ease.start
+        this.list.push(ease)
+    }
+
+    transformUpdate(ease, percent)
+    {
+        if (!this.changedTransform)
+        {
+            this.readTransform()
+            this.changedTransform = true
+        }
+        const name = ease.entry
+        const transforms = this.transforms
+        const values = ease.start + ease.delta * percent
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            if (transforms[i].name === name)
+            {
+                transforms[i].values = values
+                return
+            }
+        }
+        this.transforms.push({ name, values })
+    }
+
+    colorUpdate(ease)
+    {
+        const elementStyle = this.element.style
+        const style = ease.style
+        const colors = ease.colors
+        const i = Math.floor(this.time / ease.interval)
+        const color = colors[i]
+        if (elementStyle[style] !== color)
+        {
+            elementStyle[style] = colors[i]
+        }
+    }
+
+    colorReverse(ease)
+    {
+        const reverse = []
+        const colors = ease.colors
+        for (let color in colors)
+        {
+            reverse.unshift(colors[color])
+        }
+        reverse.push(reverse.shift())
+        ease.colors = reverse
+    }
+
+    colorStart(style, original, colors)
+    {
+        const ease = { type: 'color', style }
+        if (Array.isArray(colors))
+        {
+            ease.colors = colors
         }
         else
         {
-            const domEase = element.__domEase = new DomEaseElement(element)
-            domEase.add(params, options)
-            this.list.push(domEase)
+            ease.colors = [colors]
         }
-        return element.__domEase
+        colors.push(original)
+        ease.interval = this.duration / colors.length
+        this.list.push(ease)
     }
 
-    /**
-     * remove animation(s)
-     * @param {(Animation|HTMLElement)} object
-     */
-    remove(object)
-    {
-        const element = object.__domEase ? object.__domEase.element : object
-        const index = this.list.indexOf(element)
-        if (index !== -1)
-        {
-            this.list.splice(index, 1)
-        }
-        delete element.__domEase
-    }
-
-    /**
-     * remove all animations from list
-     */
-    removeAll()
-    {
-        while (this.list.length)
-        {
-            const DomEaseElement = this.list.pop()
-            if (DomEaseElement.element.__domEase)
-            {
-                delete DomEaseElement.element.__domEase
-            }
-        }
-    }
-
-    /**
-     * update frame; this is called automatically if start() is used
-     * @param {number} elapsed time in ms
-     */
     update(elapsed)
     {
-        for (let i = 0, _i = this.list.length; i < _i; i++)
+        this.changedTransform = false
+        const list = this.list
+        let leftover = null
+        this.time += elapsed
+        if (this.time >= this.duration)
         {
-            if (this.list[i].update(elapsed))
+            leftover = this.time - this.duration
+            this.time -= leftover
+        }
+        const percent = this.ease(this.time, 0, 1, this.duration)
+        for (let i = 0, _i = list.length; i < _i; i++)
+        {
+            const ease = list[i]
+            switch (ease.type)
             {
-                this.list.splice(i, 1)
-                i--
-                _i--
+                case 'number':
+                    this.numberUpdate(ease, percent)
+                    break
+
+                case 'color':
+                    this.colorUpdate(ease)
+                    break
+
+                case 'transform':
+                    this.transformUpdate(ease, percent)
+                    break
             }
         }
+        if (this.changedTransform)
+        {
+            this.writeTransform()
+        }
         this.emit('each', this)
-        if (!this.empty && Array.keys(this.list).length === 0 && !this.empty)
+
+        // handle end of duration
+        if (leftover !== null)
         {
-            this.emit('done', this)
-            this.empty = true
+            if (this.reverse)
+            {
+                this.reverseEases()
+                this.time = leftover
+                this.emit('loop', this)
+                if (!this.repeat)
+                {
+                    this.reverse = false
+                }
+                else if (this.repeat !== true)
+                {
+                    this.repeat--
+                }
+            }
+            else if (this.repeat)
+            {
+                this.emit('loop', this)
+                this.time = leftover
+                if (this.repeat !== true)
+                {
+                    this.repeat--
+                }
+            }
+            else
+            {
+                this.emit('complete', this)
+                return true
+            }
         }
     }
 
-    /**
-     * number of elements being DomEaseElementd
-     * @returns {number}
-     */
-    countElements()
+    reverseEases()
     {
-        return this.list.length
+        const list = this.list
+        for (let i = 0, _i = list.length; i < _i; i++)
+        {
+            const ease = list[i]
+            if (ease.type === 'color')
+            {
+                this.colorReverse(ease)
+            }
+            else
+            {
+                this.easeReverse(ease)
+            }
+        }
     }
 
-    /**
-     * number of active animations across all elements
-     * @returns {number}
-     */
-    countRunning()
+    readTransform()
     {
-        let count = 0
-        for (let entry of this.list)
+        this.transforms = []
+        const transform = this.element.style.transform
+        let inside, name = '', values
+        for (let i = 0, _i = transform.length; i < _i; i++)
         {
-            count += Object.keys(entry).length - 1
+            const letter = transform[i]
+            if (inside)
+            {
+                if (letter === ')')
+                {
+                    inside = false
+                    this.transforms.push({ name, values })
+                    name = ''
+                }
+                else
+                {
+                    values += letter
+                }
+            }
+            else
+            {
+                if (letter === '(')
+                {
+                    values = ''
+                    inside = true
+                }
+                else if (letter !== ' ')
+                {
+                    name += letter
+                }
+            }
         }
-        return count
+    }
+
+    writeTransform()
+    {
+        const transforms = this.transforms
+        let s = ''
+        for (let i = 0, _i = transforms.length; i < _i; i++)
+        {
+            const transform = transforms[i]
+            s += transform.name + '(' + transform.values + ')'
+        }
+        this.element.style.transform = s
     }
 }
 
 /**
- * fires when there are no more animations for a DOM element
- * @event DomEase#complete
- * @type {DomEase}
+ * fires when eases are complete
+ * @event Ease#complete
+ * @type {Ease}
  */
 
 /**
- * fires on each loop for a DOM element where there are animations
- * @event DomEase#each
- * @type {DomEase}
+ * fires on each loop while eases are running
+ * @event Ease#each
+ * @type {Ease}
  */
 
-module.exports = DomEase
+/**
+ * fires when eases repeat or reverse
+ * @event Ease#loop
+ * @type {Ease}
+ */
+
+module.exports = Ease

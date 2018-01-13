@@ -1,8 +1,8 @@
 {
     "name": "dom-ease",
-    "version": "0.6.3",
+    "version": "0.7.0",
     "description": "an animation library using easing functions",
-    "main": "dist/ease.js",
+    "main": "dist/domEase.js",
     "scripts": {
         "test": "budo docs/code.js:index.js --live --dir docs",
         "build-demo": "browserify docs/code.js -o docs/index.js",
