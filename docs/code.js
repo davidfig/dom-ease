@@ -1,21 +1,24 @@
 const Random = require('yy-random')
 const FPS = require('yy-fps')
+const Velocity = require('velocity-animate')
 
 const html = require('./html')
 
 const Ease = require('../dist/domEase')
 
 const SIZE = 75
-let y = 0, fps = new FPS(), boxes = []
-
-let ease = new Ease({
-    duration: 2000,
-    ease: 'easeInOutSine',
-    pauseOnBlur: true
-})
+let y = 0, ease, fps = new FPS(), boxes = []
 
 function create()
 {
+    if (!ease)
+    {
+        ease = new Ease({
+            duration: 2000,
+            ease: 'easeInOutSine',
+            pauseOnBlur: true
+        })
+    }
     while (boxes.length)
     {
         const box = boxes.pop()
@@ -32,9 +35,31 @@ function create()
     ease.add(box('height'), { height: 0 }, { repeat: true, reverse: true })
     ease.add(box('color'), { color: ['green', 'yellow', 'purple'] }, { repeat: true, reverse: true })
 }
+
+// compare speed with velocity-animate
+function createVelocity()
+{
+    const duration = 2000
+    const easing = 'easeInOutSine'
+    Velocity(box('scaleX'), { scaleX: 2 }, { duration, easing, loop: true })
+    Velocity(box('scaleY'), { scaleY: 2 }, { duration, easing, loop: true })
+    Velocity(box('top/left'), { left: window.innerWidth / 2, top: window.innerHeight / 2 }, { duration, easing, loop: true })
+    Velocity(box('scale'), { scale: 0 }, { duration, easing, loop: true })
+    // Velocity(box('backgroundColor'), { backgroundColor: ['red', 'blue', 'transparent'] }, { duration, easing, loop: true })
+    Velocity(box('opacity'), { opacity: 0 }, { duration, easing, loop: true })
+    Velocity(box('width'), { width: SIZE * 2 }, { duration, easing, loop: true })
+    Velocity(box('height'), { height: 0 }, { duration, easing, loop: true })
+    // Velocity(box('color'), { color: ['green', 'yellow', 'purple'] }, { duration, easing, loop: true })
+}
+// createVelocity()
 create()
 
-ease.on('each', () => fps.frame())
+function update()
+{
+    fps.frame()
+    requestAnimationFrame(update)
+}
+update()
 
 const buttons = html({ parent: document.body, styles: { position: 'fixed', bottom: 0, left: 0, margin: '1em' }})
 const remove = html({ parent: buttons, type: 'button', styles: { margin: '5px' }, html: 'cancel all animations' })

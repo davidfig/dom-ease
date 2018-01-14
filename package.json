@@ -26,6 +26,7 @@
         "penner": "^0.1.3"
     },
     "devDependencies": {
+        "velocity-animate": "^1.5.0",
         "babel-cli": "^6.26.0",
         "babel-preset-env": "^1.6.1",
         "fork-me-github": "^1.0.3",
