@@ -14,6 +14,7 @@ Here's a list of supported animations:
 * backgroundColor - one or more background colors to cycle through, including the current color
 * width / height in px
 * opacity
+* open a github issue if you want other parameters animated
 
 ## Installation
 
@@ -38,4 +39,4 @@ Here's a list of supported animations:
 
 ## License 
 MIT License  
-(c) 2017 [YOPEY YOPEY LLC](https://yopeyopey.com/) by [David Figatner](https://twitter.com/yopey_yopey/)
+(c) 2018 [YOPEY YOPEY LLC](https://yopeyopey.com/) by [David Figatner](https://twitter.com/yopey_yopey/)
