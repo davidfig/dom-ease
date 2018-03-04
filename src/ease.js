@@ -23,6 +23,7 @@ class Ease extends EventEmitter
      * @param {(string|function)} [options.ease]
      * @param {(boolean|number)} [options.repeat]
      * @param {boolean} [options.reverse]
+     * @param {number} [options.wait]
      * @returns {Ease}
      * @fires Ease#each
      * @fires Ease#complete
@@ -39,6 +40,7 @@ class Ease extends EventEmitter
         this.ease = options.ease
         this.repeat = options.repeat
         this.reverse = options.reverse
+        this.wait = options.wait || 0
         for (let entry in params)
         {
             switch (entry)
@@ -72,7 +74,7 @@ class Ease extends EventEmitter
                     break
 
                 case 'opacity':
-                    this.numberStart(entry, exists(element.opacity) ? parseFloat(element.opacity) : 1, params[entry])
+                    this.numberStart(entry, exists(element.style.opacity) ? parseFloat(element.style.opacity) : 1, params[entry])
                     break
 
                 case 'width':
@@ -221,6 +223,19 @@ class Ease extends EventEmitter
 
     update(elapsed)
     {
+        if (this.wait)
+        {
+            this.wait -= elapsed
+            if (this.wait < 0)
+            {
+                elapsed = -this.wait
+                this.wait = 0
+            }
+            else
+            {
+                return
+            }
+        }
         this.changedTransform = false
         const list = this.list
         let leftover = null
