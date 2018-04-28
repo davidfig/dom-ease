@@ -33,11 +33,11 @@ class DomEase extends EventEmitter
         this.options.ease = this.options.ease || Penner.linear
         this.list = []
         this.empty = true
-        if (!options.autostart)
+        if (!this.options.autostart)
         {
             this.start()
         }
-        if (options.pauseOnBlur)
+        if (this.options.pauseOnBlur)
         {
             window.addEventListener('blur', () => this.blur())
             window.addEventListener('focus', () => this.focus())

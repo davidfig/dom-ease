@@ -48,10 +48,10 @@ var DomEase = function (_EventEmitter) {
         _this.options.ease = _this.options.ease || Penner.linear;
         _this.list = [];
         _this.empty = true;
-        if (!options.autostart) {
+        if (!_this.options.autostart) {
             _this.start();
         }
-        if (options.pauseOnBlur) {
+        if (_this.options.pauseOnBlur) {
             window.addEventListener('blur', function () {
                 return _this.blur();
             });
