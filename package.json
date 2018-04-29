@@ -1,6 +1,6 @@
 {
     "name": "dom-ease",
-    "version": "0.7.5",
+    "version": "0.8.0",
     "description": "a DOM animation library using easing functions",
     "main": "dist/domEase.js",
     "scripts": {

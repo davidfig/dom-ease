@@ -9,7 +9,9 @@ class Ease extends EventEmitter
      * @param {HTMLElement} element
      * @param {object} params
      * @param {number} [params.left] in px
+     * @param {number} [params.right] in px
      * @param {number} [params.top] in px
+     * @param {number} [params.bottom] in px
      * @param {number} [params.width] in px
      * @param {number} [params.height] in px
      * @param {number} [params.scale]
@@ -51,6 +53,14 @@ class Ease extends EventEmitter
 
                 case 'top':
                     this.numberStart(entry, element.offsetTop, params[entry], 'px')
+                    break
+
+                case 'bottom':
+                    this.numberStart(entry, element.parentNode.offsetHeight - (element.offsetTop + element.offsetHeight), params[entry], 'px')
+                    break
+
+                case 'right':
+                    this.numberStart(entry, element.parentNode.offsetWidth - (element.offsetLeft + element.offsetWidth), params[entry], 'px')
                     break
 
                 case 'color':

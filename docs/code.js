@@ -4,7 +4,7 @@ const Velocity = require('velocity-animate')
 
 const html = require('./html')
 
-const Ease = require('../dist/domEase')
+const Ease = require('../src/domEase')
 
 const SIZE = 75
 let y = 0, ease, fps = new FPS(), boxes = []
@@ -34,6 +34,13 @@ function create()
     ease.add(box('width'), { width: SIZE * 2 }, { repeat: true, reverse: true })
     ease.add(box('height'), { height: 0 }, { repeat: true, reverse: true })
     ease.add(box('color'), { color: ['green', 'yellow', 'purple'] }, { repeat: true, reverse: true })
+    const right = box('right')
+    right.style.right = 0
+    ease.add(right, { right: SIZE }, { repeat: true, reverse: true })
+    const bottom = box('bottom')
+    bottom.style.bottom = 0
+    bottom.style.top = 'unset'
+    ease.add(bottom, { bottom: SIZE }, { repeat: true, reverse: true })
 }
 
 // compare speed with velocity-animate
