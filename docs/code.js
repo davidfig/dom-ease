@@ -6,7 +6,7 @@ const html = require('./html')
 
 const Ease = require('../src/domEase')
 
-const SIZE = 75
+const SIZE = 50
 let y = 0, ease, fps = new FPS(), boxes = []
 
 function create()
@@ -37,6 +37,8 @@ function create()
     const right = box('right')
     right.style.right = 0
     ease.add(right, { right: SIZE }, { repeat: true, reverse: true })
+    ease.add(box('marginLeft'), { marginLeft: 30 }, { repeat: true, reverse: true })
+    ease.add(box('marginRight'), { marginLeft: -30 }, { repeat: true, reverse: true })
     const bottom = box('bottom')
     bottom.style.bottom = 0
     bottom.style.top = 'unset'

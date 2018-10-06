@@ -189,7 +189,12 @@
         </header>
         <article>
             <pre id="source-code" class="prettyprint source "><code>const EventEmitter = require('eventemitter3')
-const exists = require('exists')
+
+const Number = require('./number')
+const Color = require('./color')
+const Transform = require('./transform')
+const Margin = require('./margin')
+const utils = require('./utils')
 
 class Ease extends EventEmitter
 {
@@ -208,9 +213,14 @@ class Ease extends EventEmitter
      * @param {number} [params.scaleX]
      * @param {number} [params.scaleY]
      * @param {number} [params.opacity]
+     * @param {number} [params.marginLeft] in px
+     * @param {number} [params.marginRight] in px
+     * @param {number} [params.marginTop] in px
+     * @param {number} [params.marginBottom] in px
      * @param {(color|color[])} [params.color]
      * @param {(color|color[])} [params.backgroundColor]
      * @param {object} [options]
+     * @param {number} [options.start] use this as the starting value
      * @param {number} [options.duration]
      * @param {(string|function)} [options.ease]
      * @param {(boolean|number)} [options.repeat]
@@ -238,187 +248,86 @@ class Ease extends EventEmitter
             switch (entry)
             {
                 case 'left':
-                    this.numberStart(entry, element.offsetLeft, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetLeft, params[entry], 'px'))
                     break
 
                 case 'top':
-                    this.numberStart(entry, element.offsetTop, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetTop, params[entry], 'px'))
                     break
 
                 case 'bottom':
-                    this.numberStart(entry, element.parentNode.offsetHeight - (element.offsetTop + element.offsetHeight), params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.parentNode.offsetHeight - (element.offsetTop + element.offsetHeight), params[entry], 'px'))
                     break
 
                 case 'right':
-                    this.numberStart(entry, element.parentNode.offsetWidth - (element.offsetLeft + element.offsetWidth), params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.parentNode.offsetWidth - (element.offsetLeft + element.offsetWidth), params[entry], 'px'))
                     break
 
                 case 'color':
-                    this.colorStart('color', element.style.color, params[entry])
+                    this.list.push(new Color(element, 'color', params[entry], this.duration / (1 + params[entry].length)))
                     break
 
                 case 'backgroundColor':
-                    this.colorStart('backgroundColor', element.style.backgroundColor, params[entry])
+                    this.list.push(new Color(element, 'backgroundColor', this.duration / (1 + params[entry].length)))
                     break
 
                 case 'scale':
-                    this.transformStart(entry, params[entry])
+                    if (this.transform)
+                    {
+                        this.transform.add('scaleX', params[entry])
+                    }
+                    else
+                    {
+                        this.transform = new Transform(element, 'scaleX', params[entry])
+                        this.list.push(this.transform)
+                    }
+                    this.transform.add('scaleY', params[entry])
                     break
 
                 case 'scaleX':
-                    this.transformStart(entry, params[entry])
-                    break
-
                 case 'scaleY':
-                    this.transformStart(entry, params[entry])
+                    if (this.transform)
+                    {
+                        this.transform.add(entry, params[entry])
+                    }
+                    else
+                    {
+                        this.transform = new Transform(element, entry, params[entry])
+                        this.list.push(this.transform)
+                    }
                     break
 
                 case 'opacity':
-                    this.numberStart(entry, exists(element.style.opacity) ? parseFloat(element.style.opacity) : 1, params[entry])
+                    this.list.push(new Number(element, entry, utils.getComputed(element, 'opacity'), params[entry]))
                     break
 
                 case 'width':
-                    this.numberStart(entry, element.offsetWidth, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetWidth, params[entry], 'px'))
                     break
 
                 case 'height':
-                    this.numberStart(entry, element.offsetHeight, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetHeight, params[entry], 'px'))
+                    break
+
+                case 'marginLeft':
+                case 'marginRight':
+                case 'marginTop':
+                case 'marginBottom':
+                    if (this.margin)
+                    {
+                        this.margin.add(entry, params[entry])
+                    }
+                    else
+                    {
+                        this.margin = new Margin(element, entry, params[entry])
+                        this.list.push(this.margin)
+                    }
                     break
 
                 default:
                     console.warn(entry + ' not setup for animation in dom-ease.')
             }
         }
-    }
-
-    /**
-     * create number entry
-     * @private
-     * @param {string} entry
-     * @param {number} start
-     * @param {number} to
-     * @param {string} [units]
-     */
-    numberStart(entry, start, to, units)
-    {
-        const ease = { type: 'number', entry, to, start, delta: to - start, units: units || '' }
-        this.list.push(ease)
-    }
-
-    numberUpdate(ease, percent)
-    {
-        this.element.style[ease.entry] = (ease.start + ease.delta * percent) + ease.units
-    }
-
-    /**
-     * reverse number and transform
-     * @private
-     * @param {object} ease
-     */
-    easeReverse(ease)
-    {
-        const swap = ease.to
-        ease.to = ease.start
-        ease.start = swap
-        ease.delta = -ease.delta
-    }
-
-    transformStart(entry, to)
-    {
-        const ease = { type: 'transform', entry, to }
-        if (!this.transforms)
-        {
-            this.readTransform()
-        }
-        const transforms = this.transforms
-        let found
-        for (let i = 0, _i = transforms.length; i &lt; _i; i++)
-        {
-            const transform = transforms[i]
-            if (transform.name === entry)
-            {
-                switch (entry)
-                {
-                    case 'scale': case 'scaleX': case 'scaleY':
-                        ease.start = parseFloat(transform.values)
-                        break
-                }
-                found = true
-                break
-            }
-        }
-        if (!found)
-        {
-            switch (entry)
-            {
-                case 'scale': case 'scaleX': case 'scaleY':
-                    ease.start = 1
-            }
-        }
-        ease.delta = to - ease.start
-        this.list.push(ease)
-    }
-
-    transformUpdate(ease, percent)
-    {
-        if (!this.changedTransform)
-        {
-            this.readTransform()
-            this.changedTransform = true
-        }
-        const name = ease.entry
-        const transforms = this.transforms
-        const values = ease.start + ease.delta * percent
-        for (let i = 0, _i = transforms.length; i &lt; _i; i++)
-        {
-            if (transforms[i].name === name)
-            {
-                transforms[i].values = values
-                return
-            }
-        }
-        this.transforms.push({ name, values })
-    }
-
-    colorUpdate(ease)
-    {
-        const elementStyle = this.element.style
-        const style = ease.style
-        const colors = ease.colors
-        const i = Math.floor(this.time / ease.interval)
-        const color = colors[i]
-        if (elementStyle[style] !== color)
-        {
-            elementStyle[style] = colors[i]
-        }
-    }
-
-    colorReverse(ease)
-    {
-        const reverse = []
-        const colors = ease.colors
-        for (let color in colors)
-        {
-            reverse.unshift(colors[color])
-        }
-        reverse.push(reverse.shift())
-        ease.colors = reverse
-    }
-
-    colorStart(style, original, colors)
-    {
-        const ease = { type: 'color', style }
-        if (Array.isArray(colors))
-        {
-            ease.colors = colors
-        }
-        else
-        {
-            ease.colors = [colors]
-        }
-        colors.push(original)
-        ease.interval = this.duration / colors.length
-        this.list.push(ease)
     }
 
     update(elapsed)
@@ -436,7 +345,6 @@ class Ease extends EventEmitter
                 return
             }
         }
-        this.changedTransform = false
         const list = this.list
         let leftover = null
         this.time += elapsed
@@ -448,25 +356,7 @@ class Ease extends EventEmitter
         const percent = this.ease(this.time, 0, 1, this.duration)
         for (let i = 0, _i = list.length; i &lt; _i; i++)
         {
-            const ease = list[i]
-            switch (ease.type)
-            {
-                case 'number':
-                    this.numberUpdate(ease, percent)
-                    break
-
-                case 'color':
-                    this.colorUpdate(ease)
-                    break
-
-                case 'transform':
-                    this.transformUpdate(ease, percent)
-                    break
-            }
-        }
-        if (this.changedTransform)
-        {
-            this.writeTransform()
+            list[i].update(percent, this.time)
         }
         this.emit('each', this)
 
@@ -510,63 +400,8 @@ class Ease extends EventEmitter
         for (let i = 0, _i = list.length; i &lt; _i; i++)
         {
             const ease = list[i]
-            if (ease.type === 'color')
-            {
-                this.colorReverse(ease)
-            }
-            else
-            {
-                this.easeReverse(ease)
-            }
+            ease.reverse()
         }
-    }
-
-    readTransform()
-    {
-        this.transforms = []
-        const transform = this.element.style.transform
-        let inside, name = '', values
-        for (let i = 0, _i = transform.length; i &lt; _i; i++)
-        {
-            const letter = transform[i]
-            if (inside)
-            {
-                if (letter === ')')
-                {
-                    inside = false
-                    this.transforms.push({ name, values })
-                    name = ''
-                }
-                else
-                {
-                    values += letter
-                }
-            }
-            else
-            {
-                if (letter === '(')
-                {
-                    values = ''
-                    inside = true
-                }
-                else if (letter !== ' ')
-                {
-                    name += letter
-                }
-            }
-        }
-    }
-
-    writeTransform()
-    {
-        const transforms = this.transforms
-        let s = ''
-        for (let i = 0, _i = transforms.length; i &lt; _i; i++)
-        {
-            const transform = transforms[i]
-            s += transform.name + '(' + transform.values + ')'
-        }
-        this.element.style.transform = s
     }
 }
 
@@ -601,7 +436,7 @@ module.exports = Ease</code></pre>
 
         <footer class="content-size">
             <div class="footer">
-                Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Apr 29 2018 14:03:44 GMT+0800 (DST)
+                Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 06 2018 15:14:03 GMT+0800 (DST)
             </div>
         </footer>
     </div>

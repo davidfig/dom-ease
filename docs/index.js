@@ -7,7 +7,7 @@ const html = require('./html')
 
 const Ease = require('../src/domEase')
 
-const SIZE = 75
+const SIZE = 50
 let y = 0, ease, fps = new FPS(), boxes = []
 
 function create()
@@ -38,6 +38,8 @@ function create()
     const right = box('right')
     right.style.right = 0
     ease.add(right, { right: SIZE }, { repeat: true, reverse: true })
+    ease.add(box('marginLeft'), { marginLeft: 30 }, { repeat: true, reverse: true })
+    ease.add(box('marginRight'), { marginLeft: -30 }, { repeat: true, reverse: true })
     const bottom = box('bottom')
     bottom.style.bottom = 0
     bottom.style.top = 'unset'
@@ -135,7 +137,7 @@ window.onload = function ()
     require('fork-me-github')('https://github.com/davidfig/pixi-ease')
     require('./highlight')()
 }
-},{"../src/domEase":199,"./highlight":2,"./html":3,"fork-me-github":6,"velocity-animate":195,"yy-fps":197,"yy-random":198}],2:[function(require,module,exports){
+},{"../src/domEase":199,"./highlight":2,"./html":3,"fork-me-github":5,"velocity-animate":194,"yy-fps":196,"yy-random":197}],2:[function(require,module,exports){
 // shows the code in the demo
 module.exports = function highlight()
 {
@@ -149,7 +151,7 @@ module.exports = function highlight()
     }
     client.send()
 }
-},{"highlight.js":8}],3:[function(require,module,exports){
+},{"highlight.js":7}],3:[function(require,module,exports){
 module.exports = function create(options)
 {
     options = options || {}
@@ -510,19 +512,6 @@ if ('undefined' !== typeof module) {
 }
 
 },{}],5:[function(require,module,exports){
-module.exports = exists;
-
-module.exports.allExist = allExist;
-
-function exists (v) {
-  return v !== null && v !== undefined;
-}
-
-function allExist (/* vals */) {
-  var vals = Array.prototype.slice.call(arguments);
-  return vals.every(exists);
-}
-},{}],6:[function(require,module,exports){
 // Programatically add fork me on github ribbon from javascript without making changes to CSS, HTML, or adding image files
 // by David Figatner
 // copyright 2017 YOPEY YOPEY LLC
@@ -676,7 +665,7 @@ module.exports = function forkMe(url, options)
     sheet.insertRule('.' + a.className + '::before' + before + '}')
     sheet.insertRule('.' + a.className + '::after' + after + '}')
 }
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*
 Syntax highlighting with language autodetection.
 https://highlightjs.org/
@@ -1494,7 +1483,7 @@ https://highlightjs.org/
   return hljs;
 }));
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var hljs = require('./highlight');
 
 hljs.registerLanguage('1c', require('./languages/1c'));
@@ -1675,7 +1664,7 @@ hljs.registerLanguage('xquery', require('./languages/xquery'));
 hljs.registerLanguage('zephir', require('./languages/zephir'));
 
 module.exports = hljs;
-},{"./highlight":7,"./languages/1c":9,"./languages/abnf":10,"./languages/accesslog":11,"./languages/actionscript":12,"./languages/ada":13,"./languages/apache":14,"./languages/applescript":15,"./languages/arduino":16,"./languages/armasm":17,"./languages/asciidoc":18,"./languages/aspectj":19,"./languages/autohotkey":20,"./languages/autoit":21,"./languages/avrasm":22,"./languages/awk":23,"./languages/axapta":24,"./languages/bash":25,"./languages/basic":26,"./languages/bnf":27,"./languages/brainfuck":28,"./languages/cal":29,"./languages/capnproto":30,"./languages/ceylon":31,"./languages/clean":32,"./languages/clojure":34,"./languages/clojure-repl":33,"./languages/cmake":35,"./languages/coffeescript":36,"./languages/coq":37,"./languages/cos":38,"./languages/cpp":39,"./languages/crmsh":40,"./languages/crystal":41,"./languages/cs":42,"./languages/csp":43,"./languages/css":44,"./languages/d":45,"./languages/dart":46,"./languages/delphi":47,"./languages/diff":48,"./languages/django":49,"./languages/dns":50,"./languages/dockerfile":51,"./languages/dos":52,"./languages/dsconfig":53,"./languages/dts":54,"./languages/dust":55,"./languages/ebnf":56,"./languages/elixir":57,"./languages/elm":58,"./languages/erb":59,"./languages/erlang":61,"./languages/erlang-repl":60,"./languages/excel":62,"./languages/fix":63,"./languages/flix":64,"./languages/fortran":65,"./languages/fsharp":66,"./languages/gams":67,"./languages/gauss":68,"./languages/gcode":69,"./languages/gherkin":70,"./languages/glsl":71,"./languages/go":72,"./languages/golo":73,"./languages/gradle":74,"./languages/groovy":75,"./languages/haml":76,"./languages/handlebars":77,"./languages/haskell":78,"./languages/haxe":79,"./languages/hsp":80,"./languages/htmlbars":81,"./languages/http":82,"./languages/hy":83,"./languages/inform7":84,"./languages/ini":85,"./languages/irpf90":86,"./languages/java":87,"./languages/javascript":88,"./languages/jboss-cli":89,"./languages/json":90,"./languages/julia":92,"./languages/julia-repl":91,"./languages/kotlin":93,"./languages/lasso":94,"./languages/ldif":95,"./languages/leaf":96,"./languages/less":97,"./languages/lisp":98,"./languages/livecodeserver":99,"./languages/livescript":100,"./languages/llvm":101,"./languages/lsl":102,"./languages/lua":103,"./languages/makefile":104,"./languages/markdown":105,"./languages/mathematica":106,"./languages/matlab":107,"./languages/maxima":108,"./languages/mel":109,"./languages/mercury":110,"./languages/mipsasm":111,"./languages/mizar":112,"./languages/mojolicious":113,"./languages/monkey":114,"./languages/moonscript":115,"./languages/n1ql":116,"./languages/nginx":117,"./languages/nimrod":118,"./languages/nix":119,"./languages/nsis":120,"./languages/objectivec":121,"./languages/ocaml":122,"./languages/openscad":123,"./languages/oxygene":124,"./languages/parser3":125,"./languages/perl":126,"./languages/pf":127,"./languages/php":128,"./languages/pony":129,"./languages/powershell":130,"./languages/processing":131,"./languages/profile":132,"./languages/prolog":133,"./languages/protobuf":134,"./languages/puppet":135,"./languages/purebasic":136,"./languages/python":137,"./languages/q":138,"./languages/qml":139,"./languages/r":140,"./languages/rib":141,"./languages/roboconf":142,"./languages/routeros":143,"./languages/rsl":144,"./languages/ruby":145,"./languages/ruleslanguage":146,"./languages/rust":147,"./languages/scala":148,"./languages/scheme":149,"./languages/scilab":150,"./languages/scss":151,"./languages/shell":152,"./languages/smali":153,"./languages/smalltalk":154,"./languages/sml":155,"./languages/sqf":156,"./languages/sql":157,"./languages/stan":158,"./languages/stata":159,"./languages/step21":160,"./languages/stylus":161,"./languages/subunit":162,"./languages/swift":163,"./languages/taggerscript":164,"./languages/tap":165,"./languages/tcl":166,"./languages/tex":167,"./languages/thrift":168,"./languages/tp":169,"./languages/twig":170,"./languages/typescript":171,"./languages/vala":172,"./languages/vbnet":173,"./languages/vbscript":175,"./languages/vbscript-html":174,"./languages/verilog":176,"./languages/vhdl":177,"./languages/vim":178,"./languages/x86asm":179,"./languages/xl":180,"./languages/xml":181,"./languages/xquery":182,"./languages/yaml":183,"./languages/zephir":184}],9:[function(require,module,exports){
+},{"./highlight":6,"./languages/1c":8,"./languages/abnf":9,"./languages/accesslog":10,"./languages/actionscript":11,"./languages/ada":12,"./languages/apache":13,"./languages/applescript":14,"./languages/arduino":15,"./languages/armasm":16,"./languages/asciidoc":17,"./languages/aspectj":18,"./languages/autohotkey":19,"./languages/autoit":20,"./languages/avrasm":21,"./languages/awk":22,"./languages/axapta":23,"./languages/bash":24,"./languages/basic":25,"./languages/bnf":26,"./languages/brainfuck":27,"./languages/cal":28,"./languages/capnproto":29,"./languages/ceylon":30,"./languages/clean":31,"./languages/clojure":33,"./languages/clojure-repl":32,"./languages/cmake":34,"./languages/coffeescript":35,"./languages/coq":36,"./languages/cos":37,"./languages/cpp":38,"./languages/crmsh":39,"./languages/crystal":40,"./languages/cs":41,"./languages/csp":42,"./languages/css":43,"./languages/d":44,"./languages/dart":45,"./languages/delphi":46,"./languages/diff":47,"./languages/django":48,"./languages/dns":49,"./languages/dockerfile":50,"./languages/dos":51,"./languages/dsconfig":52,"./languages/dts":53,"./languages/dust":54,"./languages/ebnf":55,"./languages/elixir":56,"./languages/elm":57,"./languages/erb":58,"./languages/erlang":60,"./languages/erlang-repl":59,"./languages/excel":61,"./languages/fix":62,"./languages/flix":63,"./languages/fortran":64,"./languages/fsharp":65,"./languages/gams":66,"./languages/gauss":67,"./languages/gcode":68,"./languages/gherkin":69,"./languages/glsl":70,"./languages/go":71,"./languages/golo":72,"./languages/gradle":73,"./languages/groovy":74,"./languages/haml":75,"./languages/handlebars":76,"./languages/haskell":77,"./languages/haxe":78,"./languages/hsp":79,"./languages/htmlbars":80,"./languages/http":81,"./languages/hy":82,"./languages/inform7":83,"./languages/ini":84,"./languages/irpf90":85,"./languages/java":86,"./languages/javascript":87,"./languages/jboss-cli":88,"./languages/json":89,"./languages/julia":91,"./languages/julia-repl":90,"./languages/kotlin":92,"./languages/lasso":93,"./languages/ldif":94,"./languages/leaf":95,"./languages/less":96,"./languages/lisp":97,"./languages/livecodeserver":98,"./languages/livescript":99,"./languages/llvm":100,"./languages/lsl":101,"./languages/lua":102,"./languages/makefile":103,"./languages/markdown":104,"./languages/mathematica":105,"./languages/matlab":106,"./languages/maxima":107,"./languages/mel":108,"./languages/mercury":109,"./languages/mipsasm":110,"./languages/mizar":111,"./languages/mojolicious":112,"./languages/monkey":113,"./languages/moonscript":114,"./languages/n1ql":115,"./languages/nginx":116,"./languages/nimrod":117,"./languages/nix":118,"./languages/nsis":119,"./languages/objectivec":120,"./languages/ocaml":121,"./languages/openscad":122,"./languages/oxygene":123,"./languages/parser3":124,"./languages/perl":125,"./languages/pf":126,"./languages/php":127,"./languages/pony":128,"./languages/powershell":129,"./languages/processing":130,"./languages/profile":131,"./languages/prolog":132,"./languages/protobuf":133,"./languages/puppet":134,"./languages/purebasic":135,"./languages/python":136,"./languages/q":137,"./languages/qml":138,"./languages/r":139,"./languages/rib":140,"./languages/roboconf":141,"./languages/routeros":142,"./languages/rsl":143,"./languages/ruby":144,"./languages/ruleslanguage":145,"./languages/rust":146,"./languages/scala":147,"./languages/scheme":148,"./languages/scilab":149,"./languages/scss":150,"./languages/shell":151,"./languages/smali":152,"./languages/smalltalk":153,"./languages/sml":154,"./languages/sqf":155,"./languages/sql":156,"./languages/stan":157,"./languages/stata":158,"./languages/step21":159,"./languages/stylus":160,"./languages/subunit":161,"./languages/swift":162,"./languages/taggerscript":163,"./languages/tap":164,"./languages/tcl":165,"./languages/tex":166,"./languages/thrift":167,"./languages/tp":168,"./languages/twig":169,"./languages/typescript":170,"./languages/vala":171,"./languages/vbnet":172,"./languages/vbscript":174,"./languages/vbscript-html":173,"./languages/verilog":175,"./languages/vhdl":176,"./languages/vim":177,"./languages/x86asm":178,"./languages/xl":179,"./languages/xml":180,"./languages/xquery":181,"./languages/yaml":182,"./languages/zephir":183}],8:[function(require,module,exports){
 module.exports = function(hljs){
 
   // общий паттерн для определения идентификаторов
@@ -2185,7 +2174,7 @@ module.exports = function(hljs){
     ]  
   }
 };
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = function(hljs) {
     var regexes = {
         ruleDeclaration: "^[a-zA-Z][a-zA-Z0-9-]*",
@@ -2256,7 +2245,7 @@ module.exports = function(hljs) {
       ]
     };
 };
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -2294,7 +2283,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z_$][a-zA-Z0-9_$]*';
   var IDENT_FUNC_RETURN_TYPE_RE = '([*]|[a-zA-Z_$][a-zA-Z0-9_$]*)';
@@ -2368,7 +2357,7 @@ module.exports = function(hljs) {
     illegal: /#/
   };
 };
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = // We try to support full Ada2012
 //
 // We highlight all appearances of types, keywords, literals (string, char, number, bool)
@@ -2541,7 +2530,7 @@ function(hljs) {
         ]
     };
 };
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUMBER = {className: 'number', begin: '[\\$%]\\d+'};
   return {
@@ -2587,7 +2576,7 @@ module.exports = function(hljs) {
     illegal: /\S/
   };
 };
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRING = hljs.inherit(hljs.QUOTE_STRING_MODE, {illegal: ''});
   var PARAMS = {
@@ -2673,7 +2662,7 @@ module.exports = function(hljs) {
     illegal: '//|->|=>|\\[\\['
   };
 };
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = function(hljs) {
   var CPP = hljs.getLanguage('cpp').exports;
 	return {
@@ -2773,7 +2762,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = function(hljs) {
     //local labels: %?[FB]?[AT]?\d{1,2}\w+
   return {
@@ -2865,7 +2854,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['adoc'],
@@ -3053,7 +3042,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 module.exports = function (hljs) {
   var KEYWORDS =
     'false synchronized int abstract float private char boolean static null if const ' +
@@ -3198,7 +3187,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = function(hljs) {
   var BACKTICK_ESCAPE = {
     begin: '`[\\s\\S]'
@@ -3257,7 +3246,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = function(hljs) {
     var KEYWORDS = 'ByRef Case Const ContinueCase ContinueLoop ' +
         'Default Dim Do Else ElseIf EndFunc EndIf EndSelect ' +
@@ -3393,7 +3382,7 @@ module.exports = function(hljs) {
         ]
     }
 };
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -3455,7 +3444,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = function(hljs) {
   var VARIABLE = {
     className: 'variable',
@@ -3508,7 +3497,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: 'false int abstract private char boolean static null if for true ' +
@@ -3539,7 +3528,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = function(hljs) {
   var VAR = {
     className: 'variable',
@@ -3614,7 +3603,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -3665,7 +3654,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = function(hljs){
   return {
     contains: [
@@ -3694,7 +3683,7 @@ module.exports = function(hljs){
     ]
   };
 };
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = function(hljs){
   var LITERAL = {
     className: 'literal',
@@ -3731,7 +3720,7 @@ module.exports = function(hljs){
     ]
   };
 };
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS =
     'div mod in and or not xor asserterror begin case do downto else end exit for if of repeat then to ' +
@@ -3811,7 +3800,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['capnp'],
@@ -3860,7 +3849,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 module.exports = function(hljs) {
   // 2.3. Identifiers and keywords
   var KEYWORDS =
@@ -3927,7 +3916,7 @@ module.exports = function(hljs) {
     ].concat(EXPRESSIONS)
   };
 };
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['clean','icl','dcl'],
@@ -3952,7 +3941,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -3967,7 +3956,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports = function(hljs) {
   var keywords = {
     'builtin-name':
@@ -4063,7 +4052,7 @@ module.exports = function(hljs) {
     contains: [LIST, STRING, HINT, HINT_COL, COMMENT, KEY, COLLECTION, NUMBER, LITERAL]
   }
 };
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['cmake.in'],
@@ -4101,7 +4090,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -4247,7 +4236,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -4314,7 +4303,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = function cos (hljs) {
 
   var STRINGS = {
@@ -4438,7 +4427,7 @@ module.exports = function cos (hljs) {
     ]
   };
 };
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = function(hljs) {
   var CPP_PRIMITIVE_TYPES = {
     className: 'keyword',
@@ -4613,7 +4602,7 @@ module.exports = function(hljs) {
     }
   };
 };
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 module.exports = function(hljs) {
   var RESOURCES = 'primitive rsc_template';
 
@@ -4707,7 +4696,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUM_SUFFIX = '(_[uif](8|16|32|64))?';
   var CRYSTAL_IDENT_RE = '[a-zA-Z_]\\w*[!?=]?';
@@ -4901,7 +4890,7 @@ module.exports = function(hljs) {
     contains: CRYSTAL_DEFAULT_CONTAINS
   };
 };
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -5078,7 +5067,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: false,
@@ -5100,7 +5089,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z-][a-zA-Z0-9_-]*';
   var RULE = {
@@ -5205,7 +5194,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = /**
  * Known issues:
  *
@@ -5463,7 +5452,7 @@ function(hljs) {
     ]
   };
 };
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 module.exports = function (hljs) {
   var SUBST = {
     className: 'subst',
@@ -5564,7 +5553,7 @@ module.exports = function (hljs) {
     ]
   }
 };
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS =
     'exports register file shl array record property for mod while set ally label uses raise not ' +
@@ -5633,7 +5622,7 @@ module.exports = function(hljs) {
     ].concat(COMMENT_MODES)
   };
 };
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['patch'],
@@ -5673,7 +5662,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 module.exports = function(hljs) {
   var FILTER = {
     begin: /\|[A-Za-z]+:?/,
@@ -5737,7 +5726,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['bind', 'zone'],
@@ -5766,7 +5755,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['docker'],
@@ -5788,7 +5777,7 @@ module.exports = function(hljs) {
     illegal: '</'
   }
 };
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT = hljs.COMMENT(
     /^\s*@?rem\b/, /$/,
@@ -5840,7 +5829,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 module.exports = function(hljs) {
   var QUOTED_PROPERTY = {
     className: 'string',
@@ -5887,7 +5876,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRINGS = {
     className: 'string',
@@ -6011,7 +6000,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports = function(hljs) {
   var EXPRESSION_KEYWORDS = 'if eq ne lt lte gt gte select default math sep';
   return {
@@ -6043,7 +6032,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports = function(hljs) {
     var commentMode = hljs.COMMENT(/\(\*/, /\*\)/);
 
@@ -6076,7 +6065,7 @@ module.exports = function(hljs) {
         ]
     };
 };
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports = function(hljs) {
   var ELIXIR_IDENT_RE = '[a-zA-Z_][a-zA-Z0-9_]*(\\!|\\?)?';
   var ELIXIR_METHOD_RE = '[a-zA-Z_]\\w*[!?=]?|[-+~]\\@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?';
@@ -6173,7 +6162,7 @@ module.exports = function(hljs) {
     contains: ELIXIR_DEFAULT_CONTAINS
   };
 };
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT = {
     variants: [
@@ -6257,7 +6246,7 @@ module.exports = function(hljs) {
     illegal: /;/
   };
 };
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     subLanguage: 'xml',
@@ -6272,7 +6261,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -6318,7 +6307,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports = function(hljs) {
   var BASIC_ATOM_RE = '[a-z\'][a-zA-Z0-9_\']*';
   var FUNCTION_NAME_RE = '(' + BASIC_ATOM_RE + ':' + BASIC_ATOM_RE + '|' + BASIC_ATOM_RE + ')';
@@ -6464,7 +6453,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['xlsx', 'xls'],
@@ -6512,7 +6501,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -6541,7 +6530,7 @@ module.exports = function(hljs) {
     case_insensitive: true
   };
 };
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = function (hljs) {
 
     var CHAR = {
@@ -6586,7 +6575,7 @@ module.exports = function (hljs) {
         ]
     };
 };
-},{}],65:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 module.exports = function(hljs) {
   var PARAMS = {
     className: 'params',
@@ -6657,7 +6646,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports = function(hljs) {
   var TYPEPARAM = {
     begin: '<', end: '>',
@@ -6716,7 +6705,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],67:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 module.exports = function (hljs) {
   var KEYWORDS = {
     'keyword':
@@ -6870,7 +6859,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],68:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword: 'and bool break call callexe checkinterrupt clear clearg closeall cls comlog compile ' +
@@ -7094,7 +7083,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],69:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 module.exports = function(hljs) {
     var GCODE_IDENT_RE = '[A-Z_][A-Z0-9_.]*';
     var GCODE_CLOSE_RE = '\\%';
@@ -7161,7 +7150,7 @@ module.exports = function(hljs) {
         ].concat(GCODE_CODE)
     };
 };
-},{}],70:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = function (hljs) {
   return {
     aliases: ['feature'],
@@ -7198,7 +7187,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -7315,7 +7304,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 module.exports = function(hljs) {
   var GO_KEYWORDS = {
     keyword:
@@ -7369,7 +7358,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 module.exports = function(hljs) {
     return {
       keywords: {
@@ -7392,7 +7381,7 @@ module.exports = function(hljs) {
       ]
     }
 };
-},{}],74:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -7427,7 +7416,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],75:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 module.exports = function(hljs) {
     return {
         keywords: {
@@ -7521,7 +7510,7 @@ module.exports = function(hljs) {
         illegal: /#|<\//
     }
 };
-},{}],76:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 module.exports = // TODO support filter tags like :javascript, support inline HTML
 function(hljs) {
   return {
@@ -7628,7 +7617,7 @@ function(hljs) {
     ]
   };
 };
-},{}],77:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILT_INS = {'builtin-name': 'each in with if else unless bindattr action collection debugger log outlet template unbound view yield'};
   return {
@@ -7662,7 +7651,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],78:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT = {
     variants: [
@@ -7784,7 +7773,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],79:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z_$][a-zA-Z0-9_$]*';
   var IDENT_FUNC_RETURN_TYPE_RE = '([*]|[a-zA-Z_$][a-zA-Z0-9_$]*)';
@@ -7896,7 +7885,7 @@ module.exports = function(hljs) {
     illegal: /<\//
   };
 };
-},{}],80:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -7942,7 +7931,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],81:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILT_INS = 'action collection component concat debugger each each-in else get hash if input link-to loc log mut outlet partial query-params render textarea unbound unless with yield view';
 
@@ -8013,7 +8002,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],82:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 module.exports = function(hljs) {
   var VERSION = 'HTTP/[0-9\\.]+';
   return {
@@ -8054,7 +8043,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],83:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 module.exports = function(hljs) {
   var keywords = {
     'builtin-name':
@@ -8156,7 +8145,7 @@ module.exports = function(hljs) {
     contains: [SHEBANG, LIST, STRING, HINT, HINT_COL, COMMENT, KEY, COLLECTION, NUMBER, LITERAL]
   }
 };
-},{}],84:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 module.exports = function(hljs) {
   var START_BRACKET = '\\[';
   var END_BRACKET = '\\]';
@@ -8213,7 +8202,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],85:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRING = {
     className: "string",
@@ -8279,7 +8268,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],86:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 module.exports = function(hljs) {
   var PARAMS = {
     className: 'params',
@@ -8355,7 +8344,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],87:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 module.exports = function(hljs) {
   var JAVA_IDENT_RE = '[\u00C0-\u02B8a-zA-Z_$][\u00C0-\u02B8a-zA-Z_$0-9]*';
   var GENERIC_IDENT_RE = JAVA_IDENT_RE + '(<' + JAVA_IDENT_RE + '(\\s*,\\s*' + JAVA_IDENT_RE + ')*>)?';
@@ -8463,7 +8452,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],88:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[A-Za-z$_][0-9A-Za-z$_]*';
   var KEYWORDS = {
@@ -8634,7 +8623,7 @@ module.exports = function(hljs) {
     illegal: /#(?!!)/
   };
 };
-},{}],89:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 module.exports = function (hljs) {
   var PARAM = {
     begin: /[\w-]+ *=/, returnBegin: true,
@@ -8681,7 +8670,7 @@ module.exports = function (hljs) {
     ]
   }
 };
-},{}],90:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 module.exports = function(hljs) {
   var LITERALS = {literal: 'true false null'};
   var TYPES = [
@@ -8718,7 +8707,7 @@ module.exports = function(hljs) {
     illegal: '\\S'
   };
 };
-},{}],91:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -8742,7 +8731,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],92:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 module.exports = function(hljs) {
   // Since there are numerous special names in Julia, it is too much trouble
   // to maintain them by hand. Hence these names (i.e. keywords, literals and
@@ -8904,7 +8893,7 @@ module.exports = function(hljs) {
 
   return DEFAULT;
 };
-},{}],93:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -9078,7 +9067,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],94:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 module.exports = function(hljs) {
   var LASSO_IDENT_RE = '[a-zA-Z_][\\w.]*';
   var LASSO_ANGLE_RE = '<\\?(lasso(script)?|=)';
@@ -9241,7 +9230,7 @@ module.exports = function(hljs) {
     ].concat(LASSO_CODE)
   };
 };
-},{}],95:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -9264,7 +9253,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],96:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 module.exports = function (hljs) {
   return {
     contains: [
@@ -9304,7 +9293,7 @@ module.exports = function (hljs) {
     ]
   };
 };
-},{}],97:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE        = '[\\w-]+'; // yes, Less identifiers may begin with a digit
   var INTERP_IDENT_RE = '(' + IDENT_RE + '|@{' + IDENT_RE + '})';
@@ -9444,7 +9433,7 @@ module.exports = function(hljs) {
     contains: RULES
   };
 };
-},{}],98:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 module.exports = function(hljs) {
   var LISP_IDENT_RE = '[a-zA-Z_\\-\\+\\*\\/\\<\\=\\>\\&\\#][a-zA-Z0-9_\\-\\+\\*\\/\\<\\=\\>\\&\\#!]*';
   var MEC_RE = '\\|[^]*?\\|';
@@ -9547,7 +9536,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],99:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 module.exports = function(hljs) {
   var VARIABLE = {
     begin: '\\b[gtps][A-Z]+[A-Za-z0-9_\\-]*\\b|\\$_[A-Z]+',
@@ -9704,7 +9693,7 @@ module.exports = function(hljs) {
     illegal: ';$|^\\[|^=|&|{'
   };
 };
-},{}],100:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -9853,7 +9842,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],101:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 module.exports = function(hljs) {
   var identifier = '([-a-zA-Z$._][\\w\\-$.]*)';
   return {
@@ -9942,7 +9931,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],102:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 module.exports = function(hljs) {
 
     var LSL_STRING_ESCAPE_CHARS = {
@@ -10025,7 +10014,7 @@ module.exports = function(hljs) {
         ]
     };
 };
-},{}],103:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 module.exports = function(hljs) {
   var OPENING_LONG_BRACKET = '\\[=*\\[';
   var CLOSING_LONG_BRACKET = '\\]=*\\]';
@@ -10091,7 +10080,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],104:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 module.exports = function(hljs) {
   /* Variables: simple (eg $(var)) and special (eg $@) */
   var VARIABLE = {
@@ -10172,7 +10161,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],105:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['md', 'mkdown', 'mkd'],
@@ -10280,7 +10269,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],106:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['mma'],
@@ -10338,7 +10327,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],107:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMON_CONTAINS = [
     hljs.C_NUMBER_MODE,
@@ -10426,7 +10415,7 @@ module.exports = function(hljs) {
     ].concat(COMMON_CONTAINS)
   };
 };
-},{}],108:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = 'if then else elseif for thru do while unless step in and or not';
   var LITERALS = 'true false unknown inf minf ind und %e %i %pi %phi %gamma';
@@ -10832,7 +10821,7 @@ module.exports = function(hljs) {
     illegal: /@/
   }
 };
-},{}],109:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords:
@@ -11057,7 +11046,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],110:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -11139,7 +11128,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],111:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 module.exports = function(hljs) {
     //local labels: %?[FB]?[AT]?\d{1,2}\w+
   return {
@@ -11225,7 +11214,7 @@ module.exports = function(hljs) {
     illegal: '\/'
   };
 };
-},{}],112:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords:
@@ -11244,7 +11233,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],113:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     subLanguage: 'xml',
@@ -11269,7 +11258,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],114:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUMBER = {
     className: 'number', relevance: 0,
@@ -11344,7 +11333,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],115:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -11456,7 +11445,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],116:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -11525,7 +11514,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],117:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 module.exports = function(hljs) {
   var VAR = {
     className: 'variable',
@@ -11618,7 +11607,7 @@ module.exports = function(hljs) {
     illegal: '[^\\s\\}]'
   };
 };
-},{}],118:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['nim'],
@@ -11673,7 +11662,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],119:[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 module.exports = function(hljs) {
   var NIX_KEYWORDS = {
     keyword:
@@ -11722,7 +11711,7 @@ module.exports = function(hljs) {
     contains: EXPRESSIONS
   };
 };
-},{}],120:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 module.exports = function(hljs) {
   var CONSTANTS = {
     className: 'variable',
@@ -11828,7 +11817,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],121:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 module.exports = function(hljs) {
   var API_CLASS = {
     className: 'built_in',
@@ -11919,7 +11908,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],122:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 module.exports = function(hljs) {
   /* missing support for heredoc-like string (OCaml 4.0.2+) */
   return {
@@ -11990,7 +11979,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],123:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 module.exports = function(hljs) {
 	var SPECIAL_VARS = {
 		className: 'keyword',
@@ -12047,7 +12036,7 @@ module.exports = function(hljs) {
 		]
 	}
 };
-},{}],124:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 module.exports = function(hljs) {
   var OXYGENE_KEYWORDS = 'abstract add and array as asc aspect assembly async begin break block by case class concat const copy constructor continue '+
     'create default delegate desc distinct div do downto dynamic each else empty end ensure enum equals event except exit extension external false '+
@@ -12117,7 +12106,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],125:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 module.exports = function(hljs) {
   var CURLY_SUBCOMMENT = hljs.COMMENT(
     '{',
@@ -12165,7 +12154,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],126:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 module.exports = function(hljs) {
   var PERL_KEYWORDS = 'getpwent getservent quotemeta msgrcv scalar kill dbmclose undef lc ' +
     'ma syswrite tr send umask sysopen shmwrite vec qx utime local oct semctl localtime ' +
@@ -12322,7 +12311,7 @@ module.exports = function(hljs) {
     contains: PERL_DEFAULT_CONTAINS
   };
 };
-},{}],127:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 module.exports = function(hljs) {
   var MACRO = {
     className: 'variable',
@@ -12374,7 +12363,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],128:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 module.exports = function(hljs) {
   var VARIABLE = {
     begin: '\\$+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*'
@@ -12501,7 +12490,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],129:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -12592,7 +12581,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],130:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 module.exports = function(hljs) {
   var BACKTICK_ESCAPE = {
     begin: '`[\\s\\S]',
@@ -12673,7 +12662,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],131:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -12721,7 +12710,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],132:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -12751,7 +12740,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],133:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var ATOM = {
@@ -12839,7 +12828,7 @@ module.exports = function(hljs) {
     ])
   };
 };
-},{}],134:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -12875,7 +12864,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],135:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var PUPPET_KEYWORDS = {
@@ -12990,7 +12979,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],136:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 module.exports = // Base deafult colors in PB IDE: background: #FFFFDF; foreground: #000000;
 
 function(hljs) {
@@ -13048,7 +13037,7 @@ function(hljs) {
     ]
   };
 };
-},{}],137:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -13164,7 +13153,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],138:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 module.exports = function(hljs) {
   var Q_KEYWORDS = {
   keyword:
@@ -13187,7 +13176,7 @@ module.exports = function(hljs) {
      ]
   };
 };
-},{}],139:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
       keyword:
@@ -13356,7 +13345,7 @@ module.exports = function(hljs) {
     illegal: /#/
   };
 };
-},{}],140:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '([a-zA-Z]|\\.[a-zA-Z.])[a-zA-Z0-9._]*';
 
@@ -13426,7 +13415,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],141:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords:
@@ -13453,7 +13442,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],142:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENTIFIER = '[a-zA-Z-_][^\\n{]+\\{';
 
@@ -13520,7 +13509,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],143:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 module.exports = // Colors from RouterOS terminal:
 //   green        - #0E9A00
 //   teal         - #0C9A9A
@@ -13679,7 +13668,7 @@ function(hljs) {
     ]
   };
 };
-},{}],144:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -13715,7 +13704,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],145:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 module.exports = function(hljs) {
   var RUBY_METHOD_RE = '[a-zA-Z_]\\w*[!?=]?|[-+~]\\@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?';
   var RUBY_KEYWORDS = {
@@ -13892,7 +13881,7 @@ module.exports = function(hljs) {
     contains: COMMENT_MODES.concat(IRB_DEFAULT).concat(RUBY_DEFAULT_CONTAINS)
   };
 };
-},{}],146:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -13953,7 +13942,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],147:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 module.exports = function(hljs) {
   var NUM_SUFFIX = '([ui](8|16|32|64|128|size)|f(32|64))\?';
   var KEYWORDS =
@@ -14061,7 +14050,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],148:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var ANNOTATION = { className: 'meta', begin: '@[A-Za-z]+' };
@@ -14176,7 +14165,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],149:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 module.exports = function(hljs) {
   var SCHEME_IDENT_RE = '[^\\(\\)\\[\\]\\{\\}",\'`;#|\\\\\\s]+';
   var SCHEME_SIMPLE_NUMBER_RE = '(\\-|\\+)?\\d+([./]\\d+)?';
@@ -14320,7 +14309,7 @@ module.exports = function(hljs) {
     contains: [SHEBANG, NUMBER, STRING, QUOTED_IDENT, QUOTED_LIST, LIST].concat(COMMENT_MODES)
   };
 };
-},{}],150:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var COMMON_CONTAINS = [
@@ -14374,7 +14363,7 @@ module.exports = function(hljs) {
     ].concat(COMMON_CONTAINS)
   };
 };
-},{}],151:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z-][a-zA-Z0-9_-]*';
   var VARIABLE = {
@@ -14472,7 +14461,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],152:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['console'],
@@ -14487,7 +14476,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],153:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 module.exports = function(hljs) {
   var smali_instr_low_prio = ['add', 'and', 'cmp', 'cmpg', 'cmpl', 'const', 'div', 'double', 'float', 'goto', 'if', 'int', 'long', 'move', 'mul', 'neg', 'new', 'nop', 'not', 'or', 'rem', 'return', 'shl', 'shr', 'sput', 'sub', 'throw', 'ushr', 'xor'];
   var smali_instr_high_prio = ['aget', 'aput', 'array', 'check', 'execute', 'fill', 'filled', 'goto/16', 'goto/32', 'iget', 'instance', 'invoke', 'iput', 'monitor', 'packed', 'sget', 'sparse'];
@@ -14543,7 +14532,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],154:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 module.exports = function(hljs) {
   var VAR_IDENT_RE = '[a-z][a-zA-Z0-9_]*';
   var CHAR = {
@@ -14593,7 +14582,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],155:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['ml'],
@@ -14659,7 +14648,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],156:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 module.exports = function(hljs) {
   var CPP = hljs.getLanguage('cpp').exports;
 
@@ -15030,7 +15019,7 @@ module.exports = function(hljs) {
     illegal: /#/
   };
 };
-},{}],157:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMENT_MODE = hljs.COMMENT('--', '$');
   return {
@@ -15190,7 +15179,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],158:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     contains: [
@@ -15273,7 +15262,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],159:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['do', 'ado'],
@@ -15311,7 +15300,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],160:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 module.exports = function(hljs) {
   var STEP21_IDENT_RE = '[A-Z_][A-Z0-9_.]*';
   var STEP21_KEYWORDS = {
@@ -15358,7 +15347,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],161:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var VARIABLE = {
@@ -15812,7 +15801,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],162:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 module.exports = function(hljs) {
   var DETAILS = {
     className: 'string',
@@ -15846,7 +15835,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],163:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 module.exports = function(hljs) {
   var SWIFT_KEYWORDS = {
       keyword: '__COLUMN__ __FILE__ __FUNCTION__ __LINE__ as as! as? associativity ' +
@@ -15963,7 +15952,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],164:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 module.exports = function(hljs) {
 
   var COMMENT = {
@@ -16007,7 +15996,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],165:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -16043,7 +16032,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],166:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['tk'],
@@ -16104,7 +16093,7 @@ module.exports = function(hljs) {
     ]
   }
 };
-},{}],167:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 module.exports = function(hljs) {
   var COMMAND = {
     className: 'tag',
@@ -16166,7 +16155,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],168:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILT_IN_TYPES = 'bool byte i16 i32 i64 double string binary';
   return {
@@ -16201,7 +16190,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],169:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 module.exports = function(hljs) {
   var TPID = {
     className: 'number',
@@ -16285,7 +16274,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],170:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 module.exports = function(hljs) {
   var PARAMS = {
     className: 'params',
@@ -16351,7 +16340,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],171:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = {
     keyword:
@@ -16507,7 +16496,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],172:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     keywords: {
@@ -16557,7 +16546,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],173:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['vb'],
@@ -16613,7 +16602,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],174:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     subLanguage: 'xml',
@@ -16625,7 +16614,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],175:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     aliases: ['vbs'],
@@ -16664,7 +16653,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],176:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 module.exports = function(hljs) {
   var SV_KEYWORDS = {
     keyword:
@@ -16763,7 +16752,7 @@ module.exports = function(hljs) {
     ]
   }; // return
 };
-},{}],177:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 module.exports = function(hljs) {
   // Regular expression for VHDL numeric literals.
 
@@ -16824,7 +16813,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],178:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     lexemes: /[!#@\w]+/,
@@ -16930,7 +16919,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],179:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 module.exports = function(hljs) {
   return {
     case_insensitive: true,
@@ -17066,7 +17055,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],180:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 module.exports = function(hljs) {
   var BUILTIN_MODULES =
     'ObjectLoader Animate MovieCredits Slides Filters Shading Materials LensFlare Mapping VLCAudioVideo ' +
@@ -17139,7 +17128,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],181:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 module.exports = function(hljs) {
   var XML_IDENT_RE = '[A-Za-z0-9\\._:-]+';
   var TAG_INTERNALS = {
@@ -17242,7 +17231,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],182:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 module.exports = function(hljs) {
   var KEYWORDS = 'for let if while then else return where group by xquery encoding version' +
     'module namespace boundary-space preserve strip default collation base-uri ordering' +
@@ -17313,7 +17302,7 @@ module.exports = function(hljs) {
     contains: CONTAINS
   };
 };
-},{}],183:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 module.exports = function(hljs) {
   var LITERALS = 'true false yes no null';
 
@@ -17401,7 +17390,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],184:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 module.exports = function(hljs) {
   var STRING = {
     className: 'string',
@@ -17508,7 +17497,7 @@ module.exports = function(hljs) {
     ]
   };
 };
-},{}],185:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 
 /*
 	Copyright © 2001 Robert Penner
@@ -17776,7 +17765,7 @@ module.exports = function(hljs) {
 
 }).call(this);
 
-},{}],186:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 // A library of seedable RNGs implemented in Javascript.
 //
 // Usage:
@@ -17838,7 +17827,7 @@ sr.tychei = tychei;
 
 module.exports = sr;
 
-},{"./lib/alea":187,"./lib/tychei":188,"./lib/xor128":189,"./lib/xor4096":190,"./lib/xorshift7":191,"./lib/xorwow":192,"./seedrandom":193}],187:[function(require,module,exports){
+},{"./lib/alea":186,"./lib/tychei":187,"./lib/xor128":188,"./lib/xor4096":189,"./lib/xorshift7":190,"./lib/xorwow":191,"./seedrandom":192}],186:[function(require,module,exports){
 // A port of an algorithm by Johannes Baagøe <baagoe@baagoe.com>, 2010
 // http://baagoe.com/en/RandomMusings/javascript/
 // https://github.com/nquinlan/better-random-numbers-for-javascript-mirror
@@ -17954,7 +17943,7 @@ if (module && module.exports) {
 
 
 
-},{}],188:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 // A Javascript implementaion of the "Tyche-i" prng algorithm by
 // Samuel Neves and Filipe Araujo.
 // See https://eden.dei.uc.pt/~sneves/pubs/2011-snfa2.pdf
@@ -18059,7 +18048,7 @@ if (module && module.exports) {
 
 
 
-},{}],189:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 // A Javascript implementaion of the "xor128" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -18142,7 +18131,7 @@ if (module && module.exports) {
 
 
 
-},{}],190:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 // A Javascript implementaion of Richard Brent's Xorgens xor4096 algorithm.
 //
 // This fast non-cryptographic random number generator is designed for
@@ -18290,7 +18279,7 @@ if (module && module.exports) {
   (typeof define) == 'function' && define   // present with an AMD loader
 );
 
-},{}],191:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 // A Javascript implementaion of the "xorshift7" algorithm by
 // François Panneton and Pierre L'ecuyer:
 // "On the Xorgshift Random Number Generators"
@@ -18389,7 +18378,7 @@ if (module && module.exports) {
 );
 
 
-},{}],192:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 // A Javascript implementaion of the "xorwow" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -18477,7 +18466,7 @@ if (module && module.exports) {
 
 
 
-},{}],193:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 /*
 Copyright 2014 David Bau.
 
@@ -18726,7 +18715,7 @@ if ((typeof module) == 'object' && module.exports) {
   Math    // math: package containing random, pow, and seedrandom
 );
 
-},{"crypto":201}],194:[function(require,module,exports){
+},{"crypto":205}],193:[function(require,module,exports){
 // TinyColor v1.4.1
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -19923,8 +19912,8 @@ else {
 
 })(Math);
 
-},{}],195:[function(require,module,exports){
-/*! VelocityJS.org (1.5.0). (C) 2014 Julian Shapiro. MIT @license: en.wikipedia.org/wiki/MIT_License */
+},{}],194:[function(require,module,exports){
+/*! VelocityJS.org (1.5.2). (C) 2014 Julian Shapiro. MIT @license: en.wikipedia.org/wiki/MIT_License */
 
 /*************************
  Velocity jQuery Shim
@@ -20703,7 +20692,7 @@ else {
 			hook: null, /* Defined below. */
 			/* Velocity-wide animation time remapping for testing purposes. */
 			mock: false,
-			version: {major: 1, minor: 5, patch: 1},
+			version: {major: 1, minor: 5, patch: 2},
 			/* Set to 1 or 2 (most verbose) to output debug info to console. */
 			debug: false,
 			/* Use rAF high resolution timestamp when available */
@@ -22761,10 +22750,10 @@ else {
 										if (propertiesMap === "stop") {
 											/* Since "reverse" uses cached start values (the previous call's endValues), these values must be
 											 changed to reflect the final value that the elements were actually tweened to. */
-											/* Note: If only queue:false animations are currently running on an element, it won't have a tweensContainer
-											 object. Also, queue:false animations can't be reversed. */
+											/* Note: If only queue:false/queue:"custom" animations are currently running on an element, it won't have a tweensContainer
+											 object. Also, queue:false/queue:"custom" animations can't be reversed. */
 											var data = Data(element);
-											if (data && data.tweensContainer && queueName !== false) {
+											if (data && data.tweensContainer && (queueName === true || queueName === "")) {
 												$.each(data.tweensContainer, function(m, activeTween) {
 													activeTween.endValue = activeTween.currentValue;
 												});
@@ -24698,7 +24687,7 @@ else {
  Velocity, however, doesn't make this distinction. Thus, converting to or from the % unit with these subproperties
  will produce an inaccurate conversion value. The same issue exists with the cx/cy attributes of SVG circles and ellipses. */
 
-},{}],196:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 // yy-counter
 // In-browser counter to watch changeable values like counters or FPS
 // David Figatner
@@ -24816,7 +24805,7 @@ module.exports = class Counter
         this.div.innerHTML = s
     }
 }
-},{}],197:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -25043,7 +25032,7 @@ module.exports = function () {
     return FPS;
 }();
 
-},{"tinycolor2":194,"yy-counter":196}],198:[function(require,module,exports){
+},{"tinycolor2":193,"yy-counter":195}],197:[function(require,module,exports){
 // yy-random
 // by David Figatner
 // MIT license
@@ -25469,10 +25458,53 @@ class Random
 }
 
 module.exports = new Random()
-},{"seedrandom":186}],199:[function(require,module,exports){
+},{"seedrandom":185}],198:[function(require,module,exports){
+module.exports = class Color
+{
+    constructor(element, style, colors, interval)
+    {
+        this.element = element
+        this.style = style
+        if (Array.isArray(colors))
+        {
+            this.colors = colors
+        }
+        else
+        {
+            this.colors = [colors]
+        }
+        this.colors.push(element.style[style])
+        this.interval = interval
+    }
+
+    update(percent, time)
+    {
+        const elementStyle = this.element.style
+        const style = this.style
+        const colors = this.colors
+        const i = Math.floor(time / this.interval)
+        const color = colors[i]
+        if (elementStyle[style] !== color)
+        {
+            elementStyle[style] = colors[i]
+        }
+    }
+
+    reverse()
+    {
+        const reverse = []
+        const colors = this.colors
+        for (let color in colors)
+        {
+            reverse.unshift(colors[color])
+        }
+        reverse.push(reverse.shift())
+        this.colors = reverse
+    }
+}
+},{}],199:[function(require,module,exports){
 const EventEmitter = require('eventemitter3')
 const Penner = require('penner')
-const exists = require('exists')
 
 const Ease = require('./ease')
 
@@ -25493,6 +25525,7 @@ class DomEase extends EventEmitter
      * @param {number} [options.duration=1000] default duration
      * @param {(string|function)} [options.ease=penner.linear] default ease
      * @param {(string|function)} [options.autostart=true]
+     * @param {number} [options.maximumFrameRate=16.667]
      * @param {boolean} [options.pauseOnBlur] pause timer on blur, resume on focus
      * @fires DomEase#each
      * @fires DomEase#complete
@@ -25503,6 +25536,7 @@ class DomEase extends EventEmitter
         this.options = options || {}
         this.options.duration = this.options.duration || 1000
         this.options.ease = this.options.ease || Penner.linear
+        this.options.maximumFrameRate = this.options.maximumFrameRate || 16.667
         this.list = []
         this.empty = true
         if (!this.options.autostart)
@@ -25550,7 +25584,8 @@ class DomEase extends EventEmitter
     {
         if (time)
         {
-            const elapsed = this._last ? time - this._last : 0
+            let elapsed = this._last ? time - this._last : 0
+            elapsed = elapsed > this.options.maximumFrameRate ? this.options.maximumFrameRate : elapsed
             this.update(elapsed)
         }
         this._last = time
@@ -25571,8 +25606,8 @@ class DomEase extends EventEmitter
     }
 
     /**
-     * add eases
-     * @param {HTMLElement} element
+     * add ease(s) to one or more elements
+     * @param {(HTMLElement|HTMLElement[])} element(s)
      * @param {object} params
      * @param {number} [params.left] in px
      * @param {number} [params.top] in px
@@ -25589,21 +25624,35 @@ class DomEase extends EventEmitter
      * @param {(string|function)} [options.ease]
      * @param {(boolean|number)} [options.repeat]
      * @param {boolean} [options.reverse]
-     * @returns {Ease}
+     * @returns {(Ease|Ease[])} ease(s) for each element
      */
     add(element, params, options)
     {
         // set up default options
         options = options || {}
-        options.duration = exists(options.duration) ? options.duration : this.options.duration
+        options.duration = typeof options.duration !== 'undefined' ? options.duration : this.options.duration
         options.ease = options.ease || this.options.ease
         if (typeof options.ease === 'string')
         {
             options.ease = Penner[options.ease]
         }
-        const ease = new Ease(element, params, options)
-        this.list.push(ease)
-        return ease
+        if (Array.isArray(element))
+        {
+            const eases = []
+            for (let el of element)
+            {
+                const ease = new Ease(el, params, options)
+                this.list.push(ease)
+                eases.push(ease)
+            }
+            return eases
+        }
+        else
+        {
+            const ease = new Ease(element, params, options)
+            this.list.push(ease)
+            return ease
+        }
     }
 
     /**
@@ -25668,7 +25717,7 @@ class DomEase extends EventEmitter
         this.emit('each', this)
         if (!this.empty && this.list.length === 0)
         {
-            this.emit('done', this)
+            this.emit('complete', this)
             this.empty = true
         }
     }
@@ -25696,9 +25745,14 @@ class DomEase extends EventEmitter
  */
 
 module.exports = DomEase
-},{"./ease":200,"eventemitter3":4,"exists":5,"penner":185}],200:[function(require,module,exports){
+},{"./ease":200,"eventemitter3":4,"penner":184}],200:[function(require,module,exports){
 const EventEmitter = require('eventemitter3')
-const exists = require('exists')
+
+const Number = require('./number')
+const Color = require('./color')
+const Transform = require('./transform')
+const Margin = require('./margin')
+const utils = require('./utils')
 
 class Ease extends EventEmitter
 {
@@ -25717,9 +25771,14 @@ class Ease extends EventEmitter
      * @param {number} [params.scaleX]
      * @param {number} [params.scaleY]
      * @param {number} [params.opacity]
+     * @param {number} [params.marginLeft] in px
+     * @param {number} [params.marginRight] in px
+     * @param {number} [params.marginTop] in px
+     * @param {number} [params.marginBottom] in px
      * @param {(color|color[])} [params.color]
      * @param {(color|color[])} [params.backgroundColor]
      * @param {object} [options]
+     * @param {number} [options.start] use this as the starting value
      * @param {number} [options.duration]
      * @param {(string|function)} [options.ease]
      * @param {(boolean|number)} [options.repeat]
@@ -25747,187 +25806,86 @@ class Ease extends EventEmitter
             switch (entry)
             {
                 case 'left':
-                    this.numberStart(entry, element.offsetLeft, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetLeft, params[entry], 'px'))
                     break
 
                 case 'top':
-                    this.numberStart(entry, element.offsetTop, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetTop, params[entry], 'px'))
                     break
 
                 case 'bottom':
-                    this.numberStart(entry, element.parentNode.offsetHeight - (element.offsetTop + element.offsetHeight), params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.parentNode.offsetHeight - (element.offsetTop + element.offsetHeight), params[entry], 'px'))
                     break
 
                 case 'right':
-                    this.numberStart(entry, element.parentNode.offsetWidth - (element.offsetLeft + element.offsetWidth), params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.parentNode.offsetWidth - (element.offsetLeft + element.offsetWidth), params[entry], 'px'))
                     break
 
                 case 'color':
-                    this.colorStart('color', element.style.color, params[entry])
+                    this.list.push(new Color(element, 'color', params[entry], this.duration / (1 + params[entry].length)))
                     break
 
                 case 'backgroundColor':
-                    this.colorStart('backgroundColor', element.style.backgroundColor, params[entry])
+                    this.list.push(new Color(element, 'backgroundColor', this.duration / (1 + params[entry].length)))
                     break
 
                 case 'scale':
-                    this.transformStart(entry, params[entry])
+                    if (this.transform)
+                    {
+                        this.transform.add('scaleX', params[entry])
+                    }
+                    else
+                    {
+                        this.transform = new Transform(element, 'scaleX', params[entry])
+                        this.list.push(this.transform)
+                    }
+                    this.transform.add('scaleY', params[entry])
                     break
 
                 case 'scaleX':
-                    this.transformStart(entry, params[entry])
-                    break
-
                 case 'scaleY':
-                    this.transformStart(entry, params[entry])
+                    if (this.transform)
+                    {
+                        this.transform.add(entry, params[entry])
+                    }
+                    else
+                    {
+                        this.transform = new Transform(element, entry, params[entry])
+                        this.list.push(this.transform)
+                    }
                     break
 
                 case 'opacity':
-                    this.numberStart(entry, exists(element.style.opacity) ? parseFloat(element.style.opacity) : 1, params[entry])
+                    this.list.push(new Number(element, entry, utils.getComputed(element, 'opacity'), params[entry]))
                     break
 
                 case 'width':
-                    this.numberStart(entry, element.offsetWidth, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetWidth, params[entry], 'px'))
                     break
 
                 case 'height':
-                    this.numberStart(entry, element.offsetHeight, params[entry], 'px')
+                    this.list.push(new Number(element, entry, element.offsetHeight, params[entry], 'px'))
+                    break
+
+                case 'marginLeft':
+                case 'marginRight':
+                case 'marginTop':
+                case 'marginBottom':
+                    if (this.margin)
+                    {
+                        this.margin.add(entry, params[entry])
+                    }
+                    else
+                    {
+                        this.margin = new Margin(element, entry, params[entry])
+                        this.list.push(this.margin)
+                    }
                     break
 
                 default:
                     console.warn(entry + ' not setup for animation in dom-ease.')
             }
         }
-    }
-
-    /**
-     * create number entry
-     * @private
-     * @param {string} entry
-     * @param {number} start
-     * @param {number} to
-     * @param {string} [units]
-     */
-    numberStart(entry, start, to, units)
-    {
-        const ease = { type: 'number', entry, to, start, delta: to - start, units: units || '' }
-        this.list.push(ease)
-    }
-
-    numberUpdate(ease, percent)
-    {
-        this.element.style[ease.entry] = (ease.start + ease.delta * percent) + ease.units
-    }
-
-    /**
-     * reverse number and transform
-     * @private
-     * @param {object} ease
-     */
-    easeReverse(ease)
-    {
-        const swap = ease.to
-        ease.to = ease.start
-        ease.start = swap
-        ease.delta = -ease.delta
-    }
-
-    transformStart(entry, to)
-    {
-        const ease = { type: 'transform', entry, to }
-        if (!this.transforms)
-        {
-            this.readTransform()
-        }
-        const transforms = this.transforms
-        let found
-        for (let i = 0, _i = transforms.length; i < _i; i++)
-        {
-            const transform = transforms[i]
-            if (transform.name === entry)
-            {
-                switch (entry)
-                {
-                    case 'scale': case 'scaleX': case 'scaleY':
-                        ease.start = parseFloat(transform.values)
-                        break
-                }
-                found = true
-                break
-            }
-        }
-        if (!found)
-        {
-            switch (entry)
-            {
-                case 'scale': case 'scaleX': case 'scaleY':
-                    ease.start = 1
-            }
-        }
-        ease.delta = to - ease.start
-        this.list.push(ease)
-    }
-
-    transformUpdate(ease, percent)
-    {
-        if (!this.changedTransform)
-        {
-            this.readTransform()
-            this.changedTransform = true
-        }
-        const name = ease.entry
-        const transforms = this.transforms
-        const values = ease.start + ease.delta * percent
-        for (let i = 0, _i = transforms.length; i < _i; i++)
-        {
-            if (transforms[i].name === name)
-            {
-                transforms[i].values = values
-                return
-            }
-        }
-        this.transforms.push({ name, values })
-    }
-
-    colorUpdate(ease)
-    {
-        const elementStyle = this.element.style
-        const style = ease.style
-        const colors = ease.colors
-        const i = Math.floor(this.time / ease.interval)
-        const color = colors[i]
-        if (elementStyle[style] !== color)
-        {
-            elementStyle[style] = colors[i]
-        }
-    }
-
-    colorReverse(ease)
-    {
-        const reverse = []
-        const colors = ease.colors
-        for (let color in colors)
-        {
-            reverse.unshift(colors[color])
-        }
-        reverse.push(reverse.shift())
-        ease.colors = reverse
-    }
-
-    colorStart(style, original, colors)
-    {
-        const ease = { type: 'color', style }
-        if (Array.isArray(colors))
-        {
-            ease.colors = colors
-        }
-        else
-        {
-            ease.colors = [colors]
-        }
-        colors.push(original)
-        ease.interval = this.duration / colors.length
-        this.list.push(ease)
     }
 
     update(elapsed)
@@ -25945,7 +25903,6 @@ class Ease extends EventEmitter
                 return
             }
         }
-        this.changedTransform = false
         const list = this.list
         let leftover = null
         this.time += elapsed
@@ -25957,25 +25914,7 @@ class Ease extends EventEmitter
         const percent = this.ease(this.time, 0, 1, this.duration)
         for (let i = 0, _i = list.length; i < _i; i++)
         {
-            const ease = list[i]
-            switch (ease.type)
-            {
-                case 'number':
-                    this.numberUpdate(ease, percent)
-                    break
-
-                case 'color':
-                    this.colorUpdate(ease)
-                    break
-
-                case 'transform':
-                    this.transformUpdate(ease, percent)
-                    break
-            }
-        }
-        if (this.changedTransform)
-        {
-            this.writeTransform()
+            list[i].update(percent, this.time)
         }
         this.emit('each', this)
 
@@ -26019,21 +25958,132 @@ class Ease extends EventEmitter
         for (let i = 0, _i = list.length; i < _i; i++)
         {
             const ease = list[i]
-            if (ease.type === 'color')
+            ease.reverse()
+        }
+    }
+}
+
+/**
+ * fires when eases are complete
+ * @event Ease#complete
+ * @type {Ease}
+ */
+
+/**
+ * fires on each loop while eases are running
+ * @event Ease#each
+ * @type {Ease}
+ */
+
+/**
+ * fires when eases repeat or reverse
+ * @event Ease#loop
+ * @type {Ease}
+ */
+
+module.exports = Ease
+},{"./color":198,"./margin":201,"./number":202,"./transform":203,"./utils":204,"eventemitter3":4}],201:[function(require,module,exports){
+const utils = require('./utils')
+
+const ORDER = ['marginTop', 'marginRight', 'marginBottom', 'marginLeft']
+
+module.exports = class Margin
+{
+    constructor(element, entry, to)
+    {
+        this.element = element
+        this.margins = {
+            marginTop: { start: parseInt(utils.getComputed(element, 'margin-top')) },
+            marginRight: { start: parseInt(utils.getComputed(element, 'margin-right')) },
+            marginBottom: { start: parseInt(utils.getComputed(element, 'margin-bottom')) },
+            marginLeft: { start: parseInt(utils.getComputed(element, 'margin-left')) }
+        }
+        this.add(entry, to)
+    }
+
+    add(entry, to)
+    {
+        const margin = this.margins[entry]
+        margin.animate = true
+        margin.to = to
+        margin.delta = to - margin.start
+    }
+
+    update(percent)
+    {
+        let value = ''
+        for (let key of ORDER)
+        {
+            const margin = this.margins[key]
+            if (margin.animate)
             {
-                this.colorReverse(ease)
+                value += Math.round(margin.start + margin.delta * percent) + 'px '
             }
             else
             {
-                this.easeReverse(ease)
+                value += margin.start + 'px '
+            }
+        }
+        this.element.style.margin = value
+    }
+
+    reverse()
+    {
+        for (let order of ORDER)
+        {
+            const margin = this.margins[order]
+            if (margin.animate)
+            {
+                const swap = margin.to
+                margin.to = margin.start
+                margin.start = swap
+                margin.delta = -margin.delta
             }
         }
     }
-
-    readTransform()
+}
+},{"./utils":204}],202:[function(require,module,exports){
+/**
+ * create number entry
+ * @private
+ * @param {string} entry
+ * @param {number} start
+ * @param {number} to
+ * @param {string} [units]
+ */
+module.exports = class Number
+{
+    constructor(element, entry, start, to, units)
     {
+        this.element = element
+        this.entry = entry
+        this.to = to
+        this.start = start
+        this.delta = to - start
+        this.units = units || ''
+    }
+
+    update(percent)
+    {
+        this.element.style[this.entry] = (this.start + this.delta * percent) + this.units
+    }
+
+    reverse()
+    {
+        const swap = this.to
+        this.to = this.start
+        this.start = swap
+        this.delta = -this.delta
+    }
+}
+},{}],203:[function(require,module,exports){
+module.exports = class Transform
+{
+    constructor(element, entry, to)
+    {
+        this.element = element
         this.transforms = []
-        const transform = this.element.style.transform
+        const transform = element.style.transform
         let inside, name = '', values
         for (let i = 0, _i = transform.length; i < _i; i++)
         {
@@ -26064,40 +26114,58 @@ class Ease extends EventEmitter
                 }
             }
         }
+        this.add(entry, to)
     }
 
-    writeTransform()
+    add(entry, to)
     {
-        const transforms = this.transforms
-        let s = ''
-        for (let i = 0, _i = transforms.length; i < _i; i++)
+        for (let transform of this.transforms)
         {
-            const transform = transforms[i]
-            s += transform.name + '(' + transform.values + ')'
+            if (transform.name === entry)
+            {
+                transform.start = parseFloat(transform.values)
+                transform.to = to
+                transform.delta = transform.to - transform.start
+                return
+            }
+        }
+        this.transforms.push({ name: entry, start: 1, to, delta: to - 1 })
+    }
+
+    update(percent)
+    {
+        for (let transform of this.transforms)
+        {
+            transform.values = transform.start + transform.delta * percent
+        }
+        let s = ''
+        for (let transform of this.transforms)
+        {
+            s += transform.name + '(' + transform.values + ') '
         }
         this.element.style.transform = s
     }
+
+    reverse()
+    {
+        for (let transform of this.transforms)
+        {
+            const swap = transform.to
+            transform.to = transform.start
+            transform.start = swap
+            transform.delta = -transform.delta
+        }
+    }
+}
+},{}],204:[function(require,module,exports){
+function getComputed(el, style)
+{
+    return document.defaultView.getComputedStyle(el, '').getPropertyValue(style)
 }
 
-/**
- * fires when eases are complete
- * @event Ease#complete
- * @type {Ease}
- */
-
-/**
- * fires on each loop while eases are running
- * @event Ease#each
- * @type {Ease}
- */
-
-/**
- * fires when eases repeat or reverse
- * @event Ease#loop
- * @type {Ease}
- */
-
-module.exports = Ease
-},{"eventemitter3":4,"exists":5}],201:[function(require,module,exports){
+module.exports = {
+    getComputed
+}
+},{}],205:[function(require,module,exports){
 
 },{}]},{},[1]);
