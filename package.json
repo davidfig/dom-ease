@@ -1,6 +1,6 @@
 {
     "name": "dom-ease",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "description": "a DOM animation library using easing functions",
     "main": "dist/domEase.js",
     "scripts": {
@@ -8,7 +8,7 @@
         "build-demo": "browserify docs/code.js -o docs/index.js",
         "prepublishOnly": "npm run transpile && npm run build-demo && npm run docs",
         "transpile": "babel src/ --out-dir dist --source-maps inline",
-        "docs": "jsdoc -c ./.jsdoc.json"
+        "docs": "jsdoc -c .jsdoc.json"
     },
     "repository": {
         "type": "git",

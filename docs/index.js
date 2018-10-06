@@ -25856,7 +25856,7 @@ class Ease extends EventEmitter
                     break
 
                 case 'opacity':
-                    this.list.push(new Number(element, entry, utils.getComputed(element, 'opacity'), params[entry]))
+                    this.list.push(new Number(element, entry, parseFloat(utils.getComputed(element, 'opacity')), params[entry]))
                     break
 
                 case 'width':
