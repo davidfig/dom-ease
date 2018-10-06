@@ -25617,6 +25617,10 @@ class DomEase extends EventEmitter
      * @param {number} [params.scaleX]
      * @param {number} [params.scaleY]
      * @param {number} [params.opacity]
+     * @param {number} [params.marginTop] in px
+     * @param {number} [params.marginRight] in px
+     * @param {number} [params.marginBottom] in px
+     * @param {number} [params.marginLeft] in px
      * @param {(color|color[])} [params.color]
      * @param {(color|color[])} [params.backgroundColor]
      * @param {object} [options]
