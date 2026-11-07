@@ -74,11 +74,11 @@ class Ease extends EventEmitter
                     break
 
                 case 'color':
-                    this.list.push(new Color(element, 'color', params[entry], this.duration / (1 + params[entry].length)))
+                    this.list.push(new Color(element, 'color', params[entry], this.duration))
                     break
 
                 case 'backgroundColor':
-                    this.list.push(new Color(element, 'backgroundColor', this.duration / (1 + params[entry].length)))
+                    this.list.push(new Color(element, 'backgroundColor', params[entry], this.duration))
                     break
 
                 case 'scale':
