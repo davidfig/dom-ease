@@ -85,11 +85,11 @@ var Ease = function (_EventEmitter) {
                     break;
 
                 case 'color':
-                    _this.list.push(new Color(element, 'color', params[entry], _this.duration / (1 + params[entry].length)));
+                    _this.list.push(new Color(element, 'color', params[entry], _this.duration));
                     break;
 
                 case 'backgroundColor':
-                    _this.list.push(new Color(element, 'backgroundColor', _this.duration / (1 + params[entry].length)));
+                    _this.list.push(new Color(element, 'backgroundColor', params[entry], _this.duration));
                     break;
 
                 case 'scale':

@@ -1,19 +1,11 @@
 module.exports = class Color
 {
-    constructor(element, style, colors, interval)
+    constructor(element, style, colors, duration)
     {
         this.element = element
         this.style = style
-        if (Array.isArray(colors))
-        {
-            this.colors = colors
-        }
-        else
-        {
-            this.colors = [colors]
-        }
-        this.colors.push(element.style[style])
-        this.interval = interval
+        this.colors = [].concat(colors, element.style[style])
+        this.interval = duration / this.colors.length
     }
 
     update(percent, time)
@@ -21,7 +13,7 @@ module.exports = class Color
         const elementStyle = this.element.style
         const style = this.style
         const colors = this.colors
-        const i = Math.floor(time / this.interval)
+        const i = Math.min(Math.floor(time / this.interval), colors.length - 1)
         const color = colors[i]
         if (elementStyle[style] !== color)
         {
